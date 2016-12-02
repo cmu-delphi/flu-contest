@@ -1,0 +1,20 @@
+{
+  "type": "delphi deploy config",
+  "version": 1,
+  "actions": [
+
+    "// forecast uploading",
+    {
+      "type": "move",
+      "src": "uploads/upload_forecast.py",
+      "dst": "../flu_contest/upload_forecast.py",
+      "add-header-comment": true
+    },{
+      "type": "move",
+      "src": "uploads/upload_forecast.php",
+      "dst": "/home/automation/public_html/public/flu_contest/upload_forecast.php",
+      "add-header-comment": true
+    }
+
+  ]
+}
