@@ -3,15 +3,42 @@
   "version": 1,
   "actions": [
 
-    "// forecast uploading",
+    "// automatic forecast submission",
     {
       "type": "move",
-      "src": "uploads/upload_forecast.py",
+      "src": "src/main/",
+      "dst": "../flu_contest/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
+    },
+
+    "// forecast generation",
+    {
+      "type": "move",
+      "src": "src/forecasters/",
+      "dst": "../flu_contest/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
+    },
+
+    "// utilities and i/o",
+    {
+      "type": "move",
+      "src": "src/utils/",
+      "dst": "../flu_contest/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
+    },
+
+    "// receiving uploaded forecasts",
+    {
+      "type": "move",
+      "src": "src/uploads/upload_forecast.py",
       "dst": "../flu_contest/upload_forecast.py",
       "add-header-comment": true
     },{
       "type": "move",
-      "src": "uploads/upload_forecast.php",
+      "src": "src/uploads/upload_forecast.php",
       "dst": "/home/automation/public_html/public/flu_contest/upload_forecast.php",
       "add-header-comment": true
     }
