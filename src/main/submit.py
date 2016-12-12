@@ -40,6 +40,8 @@ respective command-line flags.
 === Changelog ===
 =================
 
+2016-12-12
+  * update metadata tag
 2016-12-07
   + embed metadata tag in forecasts
   * use secrets for epicast round update
@@ -137,7 +139,7 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
     if not fc1.equals(fc2):
       raise Exception('metadata tag meaningfully changed forecast')
     Forecast.write(fc2, filename=name)
-  tag = 'submit.py %d' % round(time.time())
+  tag = 'delphi submit.py %d' % round(time.time())
   if run_ec:
     embed_metadata(ec, tag)
   if run_af:
