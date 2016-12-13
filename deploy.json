@@ -3,6 +3,25 @@
   "version": 1,
   "actions": [
 
+    "// imports",
+    {
+      "type": "import",
+      "dst": "../flu_contest/delphi_epidata.py"
+    },
+    {
+      "type": "import",
+      "dst": "../flu_contest/emailer.py"
+    },
+    {
+      "type": "import",
+      "dst": "../flu_contest/epidate.py"
+    },
+    {
+      "type": "import",
+      "name": "epiweek.py",
+      "dst": "../flu_contest/fluv_utils.py"
+    },
+
     "// automatic forecast submission",
     {
       "type": "move",
@@ -36,7 +55,8 @@
       "src": "src/uploads/upload_forecast.py",
       "dst": "../flu_contest/upload_forecast.py",
       "add-header-comment": true
-    },{
+    },
+    {
       "type": "move",
       "src": "src/uploads/upload_forecast.php",
       "dst": "/home/automation/public_html/public/flu_contest/upload_forecast.php",
