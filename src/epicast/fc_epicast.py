@@ -32,7 +32,6 @@ Generates CDC flu contest forecasts from Epicast [FLUV] user predictions.
 
 # built-in
 from statistics import median_low
-import sys
 # external
 import mysql.connector
 import numpy as np
@@ -41,7 +40,6 @@ import scipy.stats
 from delphi_epidata import Epidata
 from fc_abstract import Forecaster
 import fluv_utils as flu
-sys.path.append('/home/automation/driver')
 import secrets
 
 

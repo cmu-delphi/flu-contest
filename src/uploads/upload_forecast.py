@@ -53,13 +53,11 @@ uploading of identical files.
 
 # built-in
 import os.path
-import sys
 # external
 import mysql.connector
 # local
-import submission_loader
-sys.path.append('/home/automation/driver')
 import secrets
+import submission_loader
 
 
 def handle_upload(filename):
@@ -72,8 +70,8 @@ def handle_upload(filename):
 
 def main():
   # connect to the database
-  user, password = secrets.db.auto
-  cnx = mysql.connector.connect(user=user, password=password, database='utils')
+  u, p = secrets.db.auto
+  cnx = mysql.connector.connect(user=u, password=p, database='utils')
   cur = cnx.cursor()
 
   # get all pending uploads

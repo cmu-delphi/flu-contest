@@ -4,22 +4,29 @@
   "actions": [
 
     "// imports",
+    {"type": "import", "dst": "../flu_contest/delphi_epidata.py"},
+    {"type": "import", "dst": "../flu_contest/emailer.py"},
+    {"type": "import", "dst": "../flu_contest/epidate.py"},
+    {"type": "import", "dst": "../flu_contest/fluv_utils.py", "name": "epiweek.py"},
+    {"type": "import", "dst": "../flu_contest/neldermead.py"},
+    {"type": "import", "dst": "../flu_contest/secrets.py"},
+
+    "// epicast",
     {
-      "type": "import",
-      "dst": "../flu_contest/delphi_epidata.py"
+      "type": "move",
+      "src": "src/epicast/",
+      "dst": "../flu_contest/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
     },
+
+    "// archefilter",
     {
-      "type": "import",
-      "dst": "../flu_contest/emailer.py"
-    },
-    {
-      "type": "import",
-      "dst": "../flu_contest/epidate.py"
-    },
-    {
-      "type": "import",
-      "name": "epiweek.py",
-      "dst": "../flu_contest/fluv_utils.py"
+      "type": "move",
+      "src": "src/archefilter/",
+      "dst": "../flu_contest/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
     },
 
     "// automatic forecast submission",
@@ -40,7 +47,7 @@
       "add-header-comment": true
     },
 
-    "// utilities and i/o",
+    "// utilities and input/output",
     {
       "type": "move",
       "src": "src/utils/",

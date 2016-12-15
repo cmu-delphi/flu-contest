@@ -43,13 +43,11 @@ json: a JSON string containing the full forecast (including all regions)
 
 # built-in
 import argparse
-import sys
 # external
 import mysql.connector
 # local
 import fluv_utils as flu
 from forecast_io import Forecast
-sys.path.append('/home/automation/driver')
 import secrets
 
 

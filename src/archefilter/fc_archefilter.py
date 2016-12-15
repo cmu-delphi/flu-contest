@@ -33,7 +33,6 @@ Assimilates digital surveillance signals and a flu model to produce nowcasts
 """
 
 # built-in
-import sys
 # external
 from filterpy.kalman import MerweScaledSigmaPoints as SigmaPoints
 from filterpy.kalman import UnscentedKalmanFilter as UKF
@@ -45,7 +44,6 @@ from delphi_epidata import Epidata
 from fc_abstract import Forecaster
 import fluv_utils as flu
 from neldermead import NelderMead
-sys.path.append('/home/automation/driver')
 import secrets
 
 

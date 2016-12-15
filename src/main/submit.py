@@ -68,7 +68,6 @@ import argparse
 import mimetypes
 import os
 import os.path
-import sys
 import time
 # external
 import mysql.connector
@@ -81,10 +80,9 @@ import fluv_utils as flu
 from forecast_io import Forecast
 import forecast_tagger
 from plot_forecast import Plotter
+import secrets
 from submission_loader import load_submission
 from submissions import Submissions
-sys.path.append('/home/automation/driver')
-import secrets
 
 
 def get_expected_issue():
