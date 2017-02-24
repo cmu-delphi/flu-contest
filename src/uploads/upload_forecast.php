@@ -1,4 +1,3 @@
-<!doctype html>
 <?php
 
 /*
@@ -20,7 +19,7 @@ $dbh = mysql_connect("{$dbHost}:{$dbPort}", $dbUser, $dbPass);
 if($dbh) {
    mysql_select_db($dbName, $dbh);
 }
-?>
+?><!doctype html>
 <html>
   <head>
     <title>Forecast Uploader</title>
@@ -49,6 +48,7 @@ if($dbh) {
           $command = sprintf($template, $hmacSecret, $target_file);
           $hmac = trim(shell_exec($command));
           $expected = substr($hmac, 0, 8) . '...';
+          // todo - constant time comparison
           if($hmac === $_REQUEST['hmac']) {
             $sql = 'INSERT INTO `forecast_uploads` (`hmac`, `uploaded`, `name`, `status`, `message`) VALUES ("%s", now(), "%s", 0, "%s")';
             // trust no one...
@@ -95,7 +95,7 @@ if($dbh) {
       If two forecasts are uploaded for the same system and epiweek, the second will overwrite the first.
     </p>
     <p>
-      To compute the hmac of your forecast, run [ <span style="font-family: monospace;">openssl dgst -sha256 -hmac "<span style="color: #888; font-style: italic;">&lt;secret&gt;</span>" "<span style="color: #888; font-style: italic;">&lt;filename&gt;</span>"</spam> ]. The hmac should be a 64 character string of hex digits (32 bytes, 256 bits).
+      To compute the hmac of your forecast, run [ <span style="font-family: monospace;">openssl dgst -sha256 -hmac "<span style="color: #888; font-style: italic;">&lt;secret&gt;</span>" "<span style="color: #888; font-style: italic;">&lt;filename&gt;</span>"</span> ]. The hmac should be a 64 character string of hex digits (32 bytes, 256 bits).
     </p>
   </body>
 </html>
