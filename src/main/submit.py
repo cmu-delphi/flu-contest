@@ -205,10 +205,8 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
 Thank you for hosting the collaborative comparison of forecasts for the current flu season. Please find attached the %04dw%02d (%s) forecast%s for the %s forecasting framework%s.
 
 Best wishes,
-David Farrow
-------------
 The Delphi Group at Carnegie Mellon University
-http://delphi.midas.cs.cmu.edu/
+https://delphi.midas.cs.cmu.edu/
 ''' % (yr, ew, date, plural, name_string, plural)
     html = '''
 <html><body>
