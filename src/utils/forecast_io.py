@@ -4,8 +4,8 @@
 ===============
 
 Library for flu forecast input, output, and validation. Reads and writes 2014
-(XLS (read-only), CSV), 2015 (CSV), and 2016 (CSV, JSON) forecasts. Also
-includes utilities for calculating target values.
+(XLS (read-only), CSV), 2015 (CSV), 2016 (CSV, JSON), and 2017 (CSV; regional
+only) forecasts. Also includes utilities for calculating target values.
 
 Everything in this file is specific to the CDC flu contest: file formats,
 metadata, targets, regional wILI baselines, weeks and wILI bins, etc.
@@ -81,6 +81,8 @@ class Targets:
   @staticmethod
   def get_onset(wili, baseline):
     """ index of season onset (rounding to 1 decimal place) """
+    if baseline is None:
+      return None
     weeks_above = 0
     for i in range(len(wili)):
       w = round(wili[i], 1)
@@ -161,9 +163,9 @@ class Forecast:
     self.team = team
     self.epiweek = epiweek
     self.epiweek2 = epiweek % 100
-    self.year_weeks = {2014: 53, 2015: 52, 2016: 52}[version]
-    self.ili_bins = {2014: 11, 2015: 27, 2016: 131}[version]
-    self.ili_bin_size = {2014: 1.0, 2015: 0.5, 2016: 0.1}[version]
+    self.year_weeks = {2014: 53, 2015: 52, 2016: 52, 2017: 52}[version]
+    self.ili_bins = {2014: 11, 2015: 27, 2016: 131, 2017: 131}[version]
+    self.ili_bin_size = {2014: 1.0, 2015: 0.5, 2016: 0.1, 2017: 0.1}[version]
     self.baselines = Forecast.baselines[version]
     self.season_weeks = self.year_weeks - 19
     self.i2w = {}
@@ -586,11 +588,15 @@ class Forecast:
             row += 1
     return Forecast._write_csv(filename, rows)
 
+  def _write_v2017(self, path, filename):
+    return self._write_v2016(path, filename)
+
   def write(self, path=None, filename=None):
     return {
       2014: self._write_v2014,
       2015: self._write_v2015,
       2016: self._write_v2016,
+      2017: self._write_v2017,
     }[self.version](path, filename)
 
   @staticmethod
@@ -684,6 +690,33 @@ class Forecast:
     return fc
 
   @staticmethod
+  def _read_v2017(read, ew, team):
+    epiweek = (2017 + (1 if ew <= 20 else 0)) * 100 + ew
+    fc = Forecast(2017, datetime.now(), team, epiweek)
+    point_bin = ['Point', 'Bin']
+    for row in range(1, 8020):
+      region = Forecast.region_from_name[read(row, 0)]
+      target = Forecast.target_from_name[read(row, 1)]
+      point = read(row, 2) == 'Point'
+      unit = read(row, 3)
+      if point:
+        idx = 'point'
+        if unit == 'week':
+          value = Forecast.parse_epiweek(read(row, 6), 'float')
+        else:
+          value = float(read(row, 6))
+      else:
+        idx = read(row, 4)
+        value = float(read(row, 6))
+        if idx != 'none':
+          if unit == 'week':
+            idx = fc.w2i[int(idx)]
+          else:
+            idx = round(float(idx) * 10)
+      fc._set(region, target, idx, value)
+    return fc
+
+  @staticmethod
   def read(filename):
     extension = os.path.splitext(filename.lower())[1]
     if extension == '.csv':
@@ -701,12 +734,17 @@ class Forecast:
       return Forecast._read_v2015(read)
     elif read(0, 0) == 'Location':
       fn = os.path.basename(filename)
-      m = re.compile('^EW(\\d{2})-(.*)-\\d{4}-\\d{2}-\\d{2}.csv$').match(fn)
+      m = re.compile('^EW(\\d{2})-(.*)-(\\d{4})-\\d{2}-\\d{2}.csv$').match(fn)
       if m is not None:
         ew, team = int(m.group(1)), m.group(2)
+        year = int(m.group(3))
+        if (year == 2016 and ew >= 40) or (year == 2017 and ew <= 20):
+          return Forecast._read_v2016(read, ew, team)
+        elif (year == 2017 and ew >= 40) or (year == 2018 and ew <= 20):
+          return Forecast._read_v2017(read, ew, team)
       else:
         ew, team = 40, 'unknown'
-      return Forecast._read_v2016(read, ew, team)
+        return Forecast._read_v2016(read, ew, team)
     else:
       raise Exception('version detection failed')
 

@@ -28,7 +28,9 @@ from fc_baseline import Baseline
 from fc_epicast import Epicast
 from fc_hybrid import Hybrid
 
-SEASON = 2016
+
+SEASON = 2017
+
 
 class Submissions:
 
