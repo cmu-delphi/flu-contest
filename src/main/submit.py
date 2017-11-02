@@ -77,7 +77,7 @@ import emailer
 from epidate import EpiDate
 import flusight
 import fluv_utils as flu
-from forecast_io import Forecast
+from forecast_io import ForecastIO
 import forecast_tagger
 from plot_forecast import Plotter
 import secrets
@@ -129,27 +129,28 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
     af = sub.run_archefilter(epiweek, ili_floor, week_floor, num_samples=num_samples)
     print('AF = %s' % af)
 
-  # 1b: embed metadata
-  def embed_metadata(name, tag):
-    fc1 = Forecast.read(name)
-    fc2 = Forecast.read(name)
-    forecast_tagger.write_tag_str(fc2, tag)
-    if not fc1.equals(fc2):
-      raise Exception('metadata tag meaningfully changed forecast')
-    Forecast.write(fc2, filename=name)
-  tag = 'delphi submit.py %d' % round(time.time())
-  if run_ec:
-    embed_metadata(ec, tag)
-  if run_af:
-    embed_metadata(af, tag)
+  # TODO: make forecast_tagger work with new forecast class
+  # # 1b: embed metadata
+  # def embed_metadata(name, tag):
+  #   fc1 = ForecastIO.load_csv(name)
+  #   fc2 = ForecastIO.load_csv(name)
+  #   forecast_tagger.write_tag_str(fc2, tag)
+  #   if not fc1.equals(fc2):
+  #     raise Exception('metadata tag meaningfully changed forecast')
+  #   ForecastIO.save_csv(fc2, filename=name)
+  # tag = 'delphi submit.py %d' % round(time.time())
+  # if run_ec:
+  #   embed_metadata(ec, tag)
+  # if run_af:
+  #   embed_metadata(af, tag)
 
   # 2: sanity check
   if not insane:
     if run_ec:
-      Forecast.read(ec).sanity_check(epiweek)
+      ForecastIO.load_csv(ec).sanity_check()
       print('EC passed sanity check')
     if run_af:
-      Forecast.read(af).sanity_check(epiweek)
+      ForecastIO.load_csv(af).sanity_check()
       print('AF passed sanity check')
 
   # 3: store to database
@@ -165,9 +166,9 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
     # load the forecasts
     systems = []
     if run_ec:
-      systems.append((Forecast.read(ec), 'ec', '#960018'))
+      systems.append((ForecastIO.load_csv(ec), 'ec', '#960018'))
     if run_af:
-      systems.append((Forecast.read(af), 'af', '#c04000'))
+      systems.append((ForecastIO.load_csv(af), 'af', '#c04000'))
     # plot the forecast
     week = 'EW%02d' % flu.split_epiweek(epiweek)[1]
     Plotter.plot(systems, os.path.join(plotdir, 'fc'), week)
@@ -215,8 +216,8 @@ https://delphi.midas.cs.cmu.edu/
   "@type": "EmailMessage",
   "potentialAction": {
     "@type": "ViewAction",
-    "target": "http://delphi.midas.cs.cmu.edu/~automation/public/forecast_plots/",
-    "url": "http://delphi.midas.cs.cmu.edu/~automation/public/forecast_plots/",
+    "target": "https://delphi.midas.cs.cmu.edu/~automation/public/forecast_plots/",
+    "url": "https://delphi.midas.cs.cmu.edu/~automation/public/forecast_plots/",
     "name": "Preview"
   },
   "description": "View the most recent Epicast forecasts."

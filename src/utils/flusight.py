@@ -27,7 +27,7 @@ import re
 # external
 import requests
 # local
-from forecast_io import Forecast
+from forecast_io import ForecastIO
 
 
 def submit(email, password, filename, date=None, insane=False):
@@ -40,7 +40,7 @@ def submit(email, password, filename, date=None, insane=False):
   # basic setup
   base_url = 'https://predict.phiresearchlab.org/api/v1'
   s = requests.session()
-  forecast = Forecast.read(filename)
+  forecast = ForecastIO.load_csv(filename)
   if not insane:
     forecast.sanity_check()
 
@@ -111,7 +111,7 @@ def submit(email, password, filename, date=None, insane=False):
   with open(filename, 'rb') as f:
     file_size = len(f.read())
   current_timestamp = int(datetime.datetime.now().timestamp() * 1000)
-  forecast_json = forecast.export_flusight()
+  forecast_json = forecast.export_json_flusight()
   data = {
     'project': project_id,
     'forecasts': json.dumps(forecast_ids),
@@ -157,11 +157,12 @@ def submit(email, password, filename, date=None, insane=False):
   print('downloaded json from server (%d bytes)' % len(server_json))
 
   # verify that the forecast matches what was submitted
-  version = forecast.version
-  timestamp = forecast.timestamp
   team = forecast.team
+  timestamp = forecast.timestamp
+  season = forecast.season
   epiweek = forecast.epiweek
-  f2 = Forecast.import_flusight(version, timestamp, team, epiweek, server_json)
+  args = (server_json, team, timestamp, season, epiweek)
+  f2 = ForecastIO.import_json_flusight(*args)
   if not insane:
     f2.sanity_check()
   if not f2.equals(forecast):

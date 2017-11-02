@@ -97,7 +97,7 @@ def load_submission(file, system=None, epiweek=None, insane=False, test=False, v
     raise Exception('sanity check failed')
 
   # export JSON string
-  fc_json = fc.export_json()
+  fc_json = fc.export_json_delphi()
   log(' forecast exported (%.1f KB)' % (len(fc_json) / 1024))
 
   # store forecast

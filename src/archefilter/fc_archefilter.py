@@ -271,7 +271,7 @@ class Archefilter(Forecaster):
   }
 
   def __init__(self, test_season, num_samples):
-    super().__init__('fc-archefilter', test_season)
+    super().__init__('fc-archefilter', test_season, list(BF.keys()))
     self.archetypes = {}
     self.num_samples = num_samples
 

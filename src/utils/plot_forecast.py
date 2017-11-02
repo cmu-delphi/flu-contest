@@ -30,7 +30,7 @@ import pylab as plt
 # local
 from delphi_epidata import Epidata
 import fluv_utils as flu
-from forecast_io import Forecast
+from forecast_io import ForecastIO
 
 
 class Plotter:
@@ -52,11 +52,14 @@ class Plotter:
     axes.set_yticks(y_ticks)
     offset = -(len(forecasts) // 2) / 5
     for (forecast, label, color) in forecasts:
+      fc = forecast.get_forecast(region)
       if onset:
-        data = forecast.get_onset(region)
+        if not fc.has_onset():
+          continue
+        data = fc.get_onset()
       else:
-        data = forecast.get_peakweek(region)
-      point = forecast.w2i[int(data['point'])] + data['point'] - int(data['point'])
+        data = fc.get_peakweek()
+      point = ForecastIO.get_week_index(int(data['point'])) + data['point'] - int(data['point'])
       point += offset
       offset += 1 / 5
       axes.axvline(point, color=color)
@@ -69,11 +72,12 @@ class Plotter:
     x_ticks = [i / 5 for i in range(6)]
     axes.set_autoscale_on(False)
     axes.set_xbound(0, 1)
-    axes.set_ybound(0, 13)
+    axes.set_ybound(0, 12)
     axes.set_xticks(x_ticks)
     axes.set_yticks([])
     for (forecast, label, color) in forecasts:
-      data = forecast.get_peak(region)
+      fc = forecast.get_forecast(region)
+      data = fc.get_peak()
       point = data['point']
       axes.axhline(point, color=color)
       main_plot.axhline(point, color=color)
@@ -90,23 +94,46 @@ class Plotter:
 
     # plot settings
     x_ticks = [i for i in range(0, num_weeks, 3)]
-    x_tick_labels = ['%02d' % forecasts[0][0].i2w[i] for i in x_ticks]
+    x_tick_labels = ['%02d' % ForecastIO.get_index_week(i) for i in x_ticks]
     y_ticks = [i for i in range(0, 14, 2)]
-    baselines = Forecast.baselines[forecasts[0][0].version]
+    regions = ['nat'] + ['hhs%s' % i for i in range(1, 11)]
+
+    # TODO: avoid hardcoding these values everywhere
+    baseline_values_2017 = [
+      2.2, 1.4, 3.1, 2.0, 1.9, 1.8, 4.2, 1.9, 1.3, 2.4, 1.4
+    ]
+    baselines = dict((r, v) for (r, v) in zip(regions, baseline_values_2017))
     bin_size = forecasts[0][0].ili_bin_size
 
+    # get the somewhat sorted list of all unique locations
+    locations = []
+    for info in forecasts:
+      fc = info[0]
+      for loc in fc.get_locations():
+        if loc not in locations:
+          locations.append(loc)
+
     # plot each region
-    for region in Forecast.regions:
+    for region in locations:
+
+      # only consider forecasts that include this location
+      region_forecasts = []
+      for info in forecasts:
+        if info[0].has_forecast(region):
+          region_forecasts.append(info)
+
       # center subplot
       plt.figure(figsize=(12, 12))
       ax2 = plt.subplot(3, 2, 3)
-      plt.axhline(baselines[region], color='#888888')
+      if region in baselines:
+        plt.axhline(baselines[region], color='#888888')
       weeks = [i for i in range(flu.delta_epiweeks(ew0, epiweek) + 1)]
       values = Plotter.get_unstable_wILI(region, ew0, epiweek)
       plt.plot(weeks, values, color='#000000', linewidth=2)
       weeks = [flu.delta_epiweeks(ew0, epiweek) + i for i in range(1, 5)]
-      for (forecast, label, color) in forecasts:
-        values = [forecast.get_lookahead(region, i)['point'] for i in range(1, 5)]
+      for (forecast, label, color) in region_forecasts:
+        fc = forecast.get_forecast(region)
+        values = [fc.get_lookahead(i)['point'] for i in range(1, 5)]
         plt.plot(weeks, values, color=color, linewidth=2)
       ax2.set_xbound(0, 33)
       ax2.set_ybound(0, 12)
@@ -117,13 +144,13 @@ class Plotter:
       ax2.get_yaxis().set_tick_params(labelleft='on', labelright='on')
 
       # top subplot: peakweek
-      top = Plotter.weekly_subplot(forecasts, region, plt.subplot(3, 2, 1), ax2, False)
+      top = Plotter.weekly_subplot(region_forecasts, region, plt.subplot(3, 2, 1), ax2, False)
 
       # bottom subplot: onset
-      bottom = Plotter.weekly_subplot(forecasts, region, plt.subplot(3, 2, 5), ax2, True)
+      bottom = Plotter.weekly_subplot(region_forecasts, region, plt.subplot(3, 2, 5), ax2, True)
 
       # right subplot: peakheight
-      right = Plotter.wili_subplot(forecasts, region, plt.subplot(3, 2, 4), ax2, bin_size)
+      right = Plotter.wili_subplot(region_forecasts, region, plt.subplot(3, 2, 4), ax2, bin_size)
 
       # top-right subplot: legend
       leg = plt.subplot(3, 2, 2)
@@ -152,7 +179,7 @@ class Plotter:
 
 
 if __name__ == '__main__':
-  both = False
+  both = True
 
   # args and usage
   parser = argparse.ArgumentParser()
@@ -164,9 +191,9 @@ if __name__ == '__main__':
 
   # load the forecast
   systems = []
-  systems.append((Forecast.read(args.file), 'ec', '#e00000'))
+  systems.append((ForecastIO.load_csv(args.file), 'ec', '#e00000'))
   if both:
-    systems.append((Forecast.read(args.file2), 'st', '#0000e0'))
+    systems.append((ForecastIO.load_csv(args.file2), 'st', '#0000e0'))
 
   # plot the forecast
   Plotter.plot(systems, args.output)
