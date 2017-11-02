@@ -45,10 +45,8 @@ import secrets
 
 class Epicast(Forecaster):
 
-  epicast_locations = ['nat'] + ['hhs%d' % i for i in range(1, 11)] + ['dc', 'ga', 'pa']
-
-  def __init__(self, test_season, verbose=False, users=None):
-    super().__init__('epicast', test_season, epicast_locations, smooth_weeks_bw=0, smooth_wili_bw=0)
+  def __init__(self, test_season, locations, verbose=False, users=None):
+    super().__init__('epicast', test_season, locations, smooth_weeks_bw=0, smooth_wili_bw=0)
     self.verbose = verbose
     self.users = users
 

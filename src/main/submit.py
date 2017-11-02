@@ -85,6 +85,9 @@ from submission_loader import load_submission
 from submissions import Submissions
 
 
+epicast_locations = ['nat'] + ['hhs%d' % i for i in range(1, 11)] + ['dc', 'ga', 'pa']
+
+
 def get_expected_issue():
   # two weeks before the current week
   return EpiDate.today().add_weeks(-2).get_ew()
@@ -121,7 +124,7 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
   ili_floor, week_floor = 0.001 * (ili_bin_width / 0.5), 0.001 * (week_bin_width / 1.0)
   print('with ILI-bin-width of %f, probability floor is %f' % (ili_bin_width, ili_floor))
   print('with week-bin-width of %f, probability floor is %f' % (week_bin_width, week_floor))
-  sub = Submissions(num_samples)
+  sub = Submissions(locations, num_samples)
   if run_ec:
     ec = sub.run_epicast(epiweek, ili_floor, week_floor)
     print('EC = %s' % ec)

@@ -34,11 +34,11 @@ SEASON = 2017
 
 class Submissions:
 
-  def __init__(self, num_backfill_samples=10000):
-    self.past = Baseline(SEASON, num_backfill_samples)
+  def __init__(self, locations, num_backfill_samples=10000):
+    self.past = Baseline(SEASON, num_backfill_samples, locations)
 
   def run_epicast(self, epiweek, min_week_prob, min_wili_prob):
-    future = Epicast(SEASON, verbose=True)
+    future = Epicast(SEASON, self.past.locations, verbose=True)
     forecaster = Hybrid('delphi-epicast', self.past, future)
     forecaster.min_week_prob = min_week_prob
     forecaster.min_wili_prob = min_wili_prob
@@ -62,7 +62,7 @@ class Submissions:
     return filename
 
   def run_archefilter(self, epiweek, min_week_prob, min_wili_prob, num_samples=10000):
-    future = Archefilter(SEASON, num_samples)
+    future = Archefilter(SEASON, self.past.locations, num_samples)
     forecaster = Hybrid('delphi-archefilter', self.past, future)
     forecaster.min_week_prob = min_week_prob
     forecaster.min_wili_prob = min_wili_prob
@@ -85,8 +85,9 @@ if __name__ == '__main__':
   print(' - Not uploading submissions to database')
   print(' - Not emailing submissions to CDC')
   print(' - Assuming last published wILI on %d' % epiweek)
+  print(' - Limited locations')
 
-  sub = Submissions(1000)
+  sub = Submissions(['nat', 'hhs5', 'pa'], 1000)
   ec, af = None, None
   ec = sub.run_epicast(epiweek, 0.001, 0.001)
   #af = sub.run_archefilter(epiweek, 0.002, 0.002, num_samples=1000)

@@ -270,8 +270,8 @@ class Archefilter(Forecaster):
     'hhs10': [0.371, 0.299, 0.250, 0.227, 0.210, 0.201, 0.188, 0.189, 0.186, 0.184],
   }
 
-  def __init__(self, test_season, num_samples):
-    super().__init__('fc-archefilter', test_season, list(BF.keys()))
+  def __init__(self, test_season, locations, num_samples):
+    super().__init__('fc-archefilter', test_season, locations)
     self.archetypes = {}
     self.num_samples = num_samples
 

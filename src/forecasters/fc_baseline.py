@@ -29,9 +29,9 @@ from fc_abstract import Forecaster
 
 class Baseline(Forecaster):
 
-  def __init__(self, test_season, num_samples, backfill_weeks=10, do_sampling=True):
+  def __init__(self, test_season, locations, num_samples, backfill_weeks=10, do_sampling=True):
     method = '%d%d' % (backfill_weeks is not None, do_sampling)
-    super().__init__('fc-baseline-%s' % method, test_season)
+    super().__init__('fc-baseline-%s' % method, test_season, locations)
     self.num_samples = num_samples
     self.backfill_weeks = backfill_weeks
     self.do_sampling = do_sampling
