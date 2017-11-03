@@ -7,7 +7,7 @@
     {"type": "import", "dst": "../flu_contest/delphi_epidata.py"},
     {"type": "import", "dst": "../flu_contest/emailer.py"},
     {"type": "import", "dst": "../flu_contest/epidate.py"},
-    {"type": "import", "dst": "../flu_contest/fluv_utils.py", "name": "epiweek.py"},
+    {"type": "import", "dst": "../flu_contest/epiweek.py"},
     {"type": "import", "dst": "../flu_contest/neldermead.py"},
     {"type": "import", "dst": "../flu_contest/secrets.py"},
 

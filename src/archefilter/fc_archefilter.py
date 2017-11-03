@@ -41,8 +41,8 @@ import scipy.stats as stats
 # local
 from archetype import Archetype
 from delphi_epidata import Epidata
+import epiweek as flu
 from fc_abstract import Forecaster
-import fluv_utils as flu
 from neldermead import NelderMead
 import secrets
 

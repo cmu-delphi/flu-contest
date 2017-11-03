@@ -75,8 +75,8 @@ import mysql.connector
 from delphi_epidata import Epidata
 import emailer
 from epidate import EpiDate
+import epiweek as flu
 import flusight
-import fluv_utils as flu
 from forecast_io import ForecastIO
 import forecast_tagger
 from plot_forecast import Plotter
@@ -85,7 +85,9 @@ from submission_loader import load_submission
 from submissions import Submissions
 
 
-epicast_locations = ['nat'] + ['hhs%d' % i for i in range(1, 11)] + ['dc', 'ga', 'pa']
+regions = ['nat'] + ['hhs%d' % i for i in range(1, 11)]
+af_locations = regions
+ec_locations = regions
 
 
 def get_expected_issue():
@@ -124,11 +126,12 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
   ili_floor, week_floor = 0.001 * (ili_bin_width / 0.5), 0.001 * (week_bin_width / 1.0)
   print('with ILI-bin-width of %f, probability floor is %f' % (ili_bin_width, ili_floor))
   print('with week-bin-width of %f, probability floor is %f' % (week_bin_width, week_floor))
-  sub = Submissions(locations, num_samples)
   if run_ec:
+    sub = Submissions(ec_locations, num_samples)
     ec = sub.run_epicast(epiweek, ili_floor, week_floor)
     print('EC = %s' % ec)
   if run_af:
+    sub = Submissions(af_locations, num_samples)
     af = sub.run_archefilter(epiweek, ili_floor, week_floor, num_samples=num_samples)
     print('AF = %s' % af)
 

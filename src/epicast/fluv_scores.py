@@ -34,7 +34,7 @@ import argparse
 
 import mysql.connector
 
-from fluv_utils import *
+from epiweek import *
 import secrets
 
 # Args and usage

@@ -46,7 +46,7 @@ import argparse
 # external
 import mysql.connector
 # local
-import fluv_utils as flu
+import epiweek as flu
 from forecast_io import Forecast
 import secrets
 

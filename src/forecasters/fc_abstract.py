@@ -30,7 +30,7 @@ import numpy as np
 import numpy.random as random
 import scipy.stats as stats
 # local
-import fluv_utils as flu
+import epiweek as flu
 from forecast import Forecast
 from forecast_io import ForecastIO
 from forecast_meta import Locations

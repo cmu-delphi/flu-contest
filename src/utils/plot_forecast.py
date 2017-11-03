@@ -29,7 +29,7 @@ import pylab as plt
 # external
 # local
 from delphi_epidata import Epidata
-import fluv_utils as flu
+import epiweek as flu
 from forecast_io import ForecastIO
 
 

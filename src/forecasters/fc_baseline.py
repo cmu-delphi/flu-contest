@@ -23,7 +23,7 @@ for each target by randomly sampling trajectories from the combined models.
 import numpy as np
 # local
 from delphi_epidata import Epidata
-import fluv_utils as flu
+import epiweek as flu
 from fc_abstract import Forecaster
 
 

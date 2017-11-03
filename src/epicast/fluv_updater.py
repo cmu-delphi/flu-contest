@@ -44,7 +44,7 @@ import argparse
 import mysql.connector
 
 from delphi_epidata import Epidata
-from fluv_utils import *
+from epiweek import *
 import secrets
 
 # # Temporary hack to disable epicast updates (killswitch)

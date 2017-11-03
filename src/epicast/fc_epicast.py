@@ -38,8 +38,8 @@ import numpy as np
 import scipy.stats
 # local
 from delphi_epidata import Epidata
+import epiweek as flu
 from fc_abstract import Forecaster
-import fluv_utils as flu
 import secrets
 
 

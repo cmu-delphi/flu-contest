@@ -18,7 +18,7 @@ future (including the current week).
 """
 
 # local
-import fluv_utils as flu
+import epiweek as flu
 from fc_abstract import Forecaster
 
 
