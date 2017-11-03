@@ -77,6 +77,7 @@ import emailer
 from epidate import EpiDate
 import epiweek as flu
 import flusight
+from forecast import Forecast
 from forecast_io import ForecastIO
 import forecast_tagger
 from plot_forecast import Plotter
@@ -87,7 +88,7 @@ from submissions import Submissions
 
 regions = ['nat'] + ['hhs%d' % i for i in range(1, 11)]
 af_locations = regions
-ec_locations = regions
+ec_locations = regions + ['dc', 'ga', 'pa']
 
 
 def get_expected_issue():
@@ -135,8 +136,19 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
     af = sub.run_archefilter(epiweek, ili_floor, week_floor, num_samples=num_samples)
     print('AF = %s' % af)
 
+  # 1b: split into regional and state forecasts
+  def split(filename):
+    fc_reg, fc_sta = Forecast.split(ForecastIO.load_csv(filename))
+    fc_reg.team += '-regional'
+    fc_sta.team += '-state'
+    return ForecastIO.save_csv(fc_reg), ForecastIO.save_csv(fc_sta)
+  if run_ec:
+    ec_reg, ec_sta = split(ec)
+  if run_af:
+    af_reg, af_sta = split(af)
+
   # TODO: make forecast_tagger work with new forecast class
-  # # 1b: embed metadata
+  # # 1c: embed metadata
   # def embed_metadata(name, tag):
   #   fc1 = ForecastIO.load_csv(name)
   #   fc2 = ForecastIO.load_csv(name)
@@ -154,13 +166,18 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
   if not insane:
     if run_ec:
       ForecastIO.load_csv(ec).sanity_check()
+      ForecastIO.load_csv(ec_reg).sanity_check()
+      ForecastIO.load_csv(ec_sta).sanity_check()
       print('EC passed sanity check')
     if run_af:
       ForecastIO.load_csv(af).sanity_check()
+      ForecastIO.load_csv(af_reg).sanity_check()
+      ForecastIO.load_csv(af_sta).sanity_check()
       print('AF passed sanity check')
 
   # 3: store to database
   if do_store:
+    # store only the combined forecast, not the regional/state splits
     if run_ec:
       load_submission(ec, insane=insane, test=test_mode, verbose=True)
     if run_af:
@@ -169,7 +186,7 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
   # 4: generate plots
   if plotdir is not None:
     print('generating plots...')
-    # load the forecasts
+    # load the forecasts (combined only)
     systems = []
     if run_ec:
       systems.append((ForecastIO.load_csv(ec), 'ec', '#960018'))
@@ -190,15 +207,19 @@ def submit(plotdir, run_ec, run_af, insane, epiweek, do_store, do_email, do_uplo
     systems, names, attachments = [], [], []
     path = os.getcwd()
     if run_ec:
-      ec_path = os.path.join(path, ec)
       systems.append('EW%02d-delphi-epicast-%s' % (ew, date))
       names.append('Epicast (delphi-epicast)')
-      attachments.append([(ec_path, mimetypes.types_map['.csv'])])
+      ec_reg_path = os.path.join(path, ec_reg)
+      ec_sta_path = os.path.join(path, ec_sta)
+      attachments.append([(ec_reg_path, mimetypes.types_map['.csv'])])
+      attachments.append([(ec_sta_path, mimetypes.types_map['.csv'])])
     if run_af:
-      af_path = os.path.join(path, af)
       systems.append('EW%02d-delphi-archefilter-%s' % (ew, date))
       names.append('Archefilter (delphi-archefilter)')
-      attachments.append([(af_path, mimetypes.types_map['.csv'])])
+      af_reg_path = os.path.join(path, af_reg)
+      af_sta_path = os.path.join(path, af_sta)
+      attachments.append([(af_reg_path, mimetypes.types_map['.csv'])])
+      attachments.append([(af_sta_path, mimetypes.types_map['.csv'])])
     system_string = ' + '.join(systems)
     name_string = ' and '.join(names)
     plural = 's' if len(systems) > 1 else ''
@@ -247,10 +268,14 @@ https://delphi.midas.cs.cmu.edu/
       print('testing - skipping upload')
     else:
       email, password = secrets.flucontest.flusight
-      if run_ec:
-        flusight.submit(email, password, ec)
-      if run_af:
-        flusight.submit(email, password, af)
+      # TODO: this needs to be implemented for 2017
+      raise NotImplementedError()
+      #if run_ec:
+      #  flusight.submit(email, password, ec_reg)
+      #  flusight.submit(email, password, ec_sta)
+      #if run_af:
+      #  flusight.submit(email, password, af_reg)
+      #  flusight.submit(email, password, af_sta)
       print('uploaded forecast(s) to FluSight')
 
   # 7: update epicast round
@@ -271,6 +296,7 @@ https://delphi.midas.cs.cmu.edu/
     cnx.close()
 
   print('done!')
+
 
 if __name__ == '__main__':
   # args and usage

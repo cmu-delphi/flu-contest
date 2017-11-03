@@ -44,6 +44,15 @@ class Baseline(Forecaster):
     if region in self.bf_var:
       # already trained
       return
+    if len(region) == 2:
+      # TODO: this is a hack for state ILI
+      # assume backfill of region 4
+      print('FIXME: setting backfill for %s as hhs4' % region)
+      self.bf_var[region] = self.bf_var['hhs4']
+      self.emp_mean[region] = self.emp_mean['hhs4']
+      self.emp_var[region] = self.emp_var['hhs4']
+      self.emp_curves[region] = self.emp_curves['hhs4']
+      return
     stable = self._get_stable(region)
     start_weeks = [flu.get_season(ew)[0] for ew in stable.keys()]
     curves = []

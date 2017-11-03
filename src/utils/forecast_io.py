@@ -6,6 +6,7 @@ Specific to the 2017-2018 flu season.
 
 # standard library
 import csv
+import datetime
 import json
 import os
 import re
@@ -146,7 +147,13 @@ class ForecastIO:
     ForecastIO.__save_target(writer, location, target, data, unit, idx_func)
 
   @staticmethod
-  def save_csv(forecast, filename):
+  def save_csv(forecast, filename=None):
+    if filename is None:
+      now = datetime.datetime.now()
+      week = forecast.epiweek % 100
+      args = (week, forecast.team, now.year, now.month, now.day)
+      filename = 'EW%02d-%s-%04d-%02d-%02d.csv' % args
+
     # write the csv one row at a time
     with open(filename, 'w', newline='') as f:
       dialect = csv.excel()
@@ -177,6 +184,8 @@ class ForecastIO:
         save_ili_target('peak', fc.get_peak())
         for i in range(1, 5):
           save_ili_target('x%d' % i, fc.get_lookahead(i))
+
+    return filename
 
   @staticmethod
   def import_json_delphi(json_str):

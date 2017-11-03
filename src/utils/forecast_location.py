@@ -45,6 +45,7 @@ class ForecastLocation:
       raise Exception('distribution (including `none`) must sum to 1')
     if min(dist + [none, point]) < 0:
       raise Exception('value is negative')
+    point %= 100
     if point < 1 or point >= 53:
       raise Exception('weekly point prediction not in [1, 53)')
 
@@ -63,7 +64,7 @@ class ForecastLocation:
       self.set_single_value(target, i, p)
     if target == 'onset':
       self.set_single_value(target, 'none', none)
-    self.set_single_value(target, 'point', point)
+    self.set_single_value(target, 'point', point % 100)
 
   def _set_ili_target(self, target, dist, point):
     self._check_ili_values(dist, point)

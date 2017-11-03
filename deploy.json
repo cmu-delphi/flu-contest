@@ -55,6 +55,12 @@
       "match": "^.*\\.py$",
       "add-header-comment": true
     },
+    {
+      "type": "move",
+      "src": "src/utils/forecast_plots.html",
+      "dst": "/home/automation/public_html/public/forecast_plots/index.html",
+      "add-header-comment": true
+    },
 
     "// receiving uploaded forecasts",
     {

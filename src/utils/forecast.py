@@ -73,4 +73,5 @@ class Forecast:
         raise e
 
   def equals(self, other):
+    # TODO: this needs to be implemented
     raise NotImplementedError()

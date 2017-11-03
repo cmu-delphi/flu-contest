@@ -27,6 +27,7 @@ from epidate import EpiDate
 from fc_baseline import Baseline
 from fc_epicast import Epicast
 from fc_hybrid import Hybrid
+from forecast_io import ForecastIO
 
 
 SEASON = 2017
@@ -35,7 +36,7 @@ SEASON = 2017
 class Submissions:
 
   def __init__(self, locations, num_backfill_samples=10000):
-    self.past = Baseline(SEASON, num_backfill_samples, locations)
+    self.past = Baseline(SEASON, locations, num_backfill_samples)
 
   def run_epicast(self, epiweek, min_week_prob, min_wili_prob):
     future = Epicast(SEASON, self.past.locations, verbose=True)
@@ -56,7 +57,7 @@ class Submissions:
     print('Generating epicast for', epiweek)
     forecaster.open()
     forecast = forecaster.forecast(epiweek)
-    filename = forecast.write()
+    filename = ForecastIO.save_csv(forecast)
     forecaster.close()
     print(filename)
     return filename
@@ -72,7 +73,7 @@ class Submissions:
     print('Generating archefilter for', epiweek)
     forecaster.open()
     forecast = forecaster.forecast(epiweek)
-    filename = forecast.write()
+    filename = ForecastIO.save_csv(forecast)
     forecaster.close()
     print(filename)
     return filename

@@ -27,7 +27,7 @@ class Hybrid(Forecaster):
   def __init__(self, name, past, future):
     if past.test_season != future.test_season:
       raise Exception('`past` and `future` trained on different seasons')
-    super().__init__(name, past.test_season)
+    super().__init__(name, past.test_season, past.locations)
     self.past = past
     self.future = future
     self._callback = None

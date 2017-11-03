@@ -79,7 +79,7 @@ class Targets:
           return None
     peak = round(Targets.get_peak(wili), 1)
     weeks = [i for (i, w) in enumerate(wili) if round(w, 1) == peak]
-    return statistics.median_low(weeks)
+    return median_low(weeks)
 
   @staticmethod
   def get_peak(wili):
@@ -276,7 +276,7 @@ class Forecaster(abc.ABC):
 
       # regional info
       if Locations.is_region(region):
-        baseline = Targets.baselines[self.test_season]
+        baseline = Targets.baselines[self.test_season][region]
       else:
         baseline = None
 
@@ -313,7 +313,7 @@ class Forecaster(abc.ABC):
       fc.set_lookahead(4, *x4)
 
     # sanity check completed forecast
-    forecast.sanity_check(epiweek)
+    forecast.sanity_check()
     return forecast
 
   def open(self):
@@ -334,13 +334,13 @@ class Forecaster(abc.ABC):
     plt.show()
 
   def _init(self):
-    raise NotImplementedError()
+    pass
 
   def _fini(self):
-    raise NotImplementedError()
+    pass
 
   def _train(self, region):
-    raise NotImplementedError()
+    pass
 
   @abc.abstractmethod
   def _forecast(self, region, epiweek):
