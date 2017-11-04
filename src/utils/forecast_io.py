@@ -70,31 +70,46 @@ class ForecastIO:
 
   @staticmethod
   def load_csv(filename):
-    season = 2017
     timestamp = None
-    pattern = re.compile('^EW(\\d{2})-(.*)-\\d{4}-\\d{2}-\\d{2}.csv$')
+    pattern = re.compile('^EW(\\d{2})-(.*)-(\\d{4})-\\d{2}-\\d{2}.csv$')
     match = pattern.match(os.path.basename(filename))
     if match is not None:
-      ew, team = int(match.group(1)), match.group(2)
+      ew = int(match.group(1))
+      team = match.group(2)
+      year = int(match.group(3))
       if ew < 40:
+        season = year - 1
         epiweek = (season + 1) * 100 + ew
       else:
+        season = year
         epiweek = season * 100 + ew
     else:
       raise NotImplementedError()
 
     forecast = Forecast(season, timestamp, team, epiweek)
 
+    # the default column layout
+    # can be updated based on header row
+    canonical_fields = [f.lower() for f in (
+      'Location', 'Target', 'Type', 'Unit', 'Bin_start_incl',
+      'Bin_end_notincl', 'Value'
+    )]
+    field_to_column = dict(zip(canonical_fields, range(len(canonical_fields))))
+
     # read the csv one row at a time
     with open(filename, 'r', newline='') as f:
       reader = csv.reader(f)
       for row in reader:
         # skip header row(s)
-        if row[0].lower() == 'location':
+        fields = [f.lower() for f in row]
+        if 'location' in fields:
+          # update the field-to-column-index mapping
+          field_to_column = dict(zip(fields, range(len(fields))))
           continue
 
         # extract values
-        location, target, type_, unit, start, end, value = row
+        values = [row[field_to_column[f]] for f in canonical_fields]
+        location, target, type_, unit, start, end, value = values
 
         # update forecast
         ForecastIO.__load_row(forecast, location, target, type_, start, value)
