@@ -47,7 +47,7 @@ import argparse
 import mysql.connector
 # local
 import epiweek as flu
-from forecast_io import Forecast
+from forecast_io import ForecastIO
 import secrets
 
 
@@ -55,12 +55,9 @@ def load_submission(file, system=None, epiweek=None, insane=False, test=False, v
   # logging
   log = print if verbose else lambda x: x
 
-  # try to load broken submissions
-  Forecast._permissive = True
-
   # load the forecast
   log('loading %s...' % file)
-  fc = Forecast.read(file)
+  fc = ForecastIO.load_csv(file)
   log(' forecast file parsed')
 
   # set the system (team) name
@@ -91,13 +88,12 @@ def load_submission(file, system=None, epiweek=None, insane=False, test=False, v
   # sanity check
   if insane:
     log(' sanity check skipped')
-  elif fc.sanity_check():
-    log(' sanity check passed')
   else:
-    raise Exception('sanity check failed')
+    fc.sanity_check()
+    log(' sanity check passed')
 
   # export JSON string
-  fc_json = fc.export_json_delphi()
+  fc_json = ForecastIO.export_json_delphi(fc)
   log(' forecast exported (%.1f KB)' % (len(fc_json) / 1024))
 
   # store forecast
