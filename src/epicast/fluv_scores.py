@@ -30,12 +30,16 @@ Scores Epicast FLUV users.
   * replacing missing values with most recent forecast instead of zero
 """
 
+# standard library
 import argparse
 
+# third party
 import mysql.connector
 
-from epiweek import *
-import secrets
+# first party
+import delphi.operations.secrets as secrets
+from delphi.utils.epiweek import *
+
 
 # Args and usage
 parser = argparse.ArgumentParser()

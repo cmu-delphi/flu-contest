@@ -53,14 +53,18 @@ to be emailed.
   * Original version
 """
 
+# standard library
 import argparse
 import base64
 import json
 
+# third party
 import mysql.connector
 
-import emailer
-import secrets
+# first party
+import delphi.operations.emailer as emailer
+import delphi.operations.secrets as secrets
+
 
 #Args and usage
 parser = argparse.ArgumentParser()

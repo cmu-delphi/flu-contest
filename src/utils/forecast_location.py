@@ -5,7 +5,7 @@ Specific to the 2017-2018 flu season.
 """
 
 # first party
-from forecast_meta import Locations
+from .forecast_meta import Locations
 
 
 class ForecastLocation:

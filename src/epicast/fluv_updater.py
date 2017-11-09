@@ -39,18 +39,17 @@ Performs database updates for Epicast-FLUV:
   * Original version
 """
 
+# standard library
 import argparse
 
+# third party
 import mysql.connector
 
-from delphi_epidata import Epidata
-from epiweek import *
-import secrets
+# first party
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.operations.secrets as secrets
+from delphi.utils.epiweek import *
 
-# # Temporary hack to disable epicast updates (killswitch)
-# import sys
-# print('FLUV Updates are temporarily disabled!')
-# sys.exit(0)
 
 # Args and usage
 parser = argparse.ArgumentParser()

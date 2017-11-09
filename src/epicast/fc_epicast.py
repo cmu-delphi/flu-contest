@@ -30,17 +30,19 @@ Generates CDC flu contest forecasts from Epicast [FLUV] user predictions.
   + first version, based partly on last year's fluv_submission.py
 """
 
-# built-in
+# standard library
 from statistics import median_low
-# external
+
+# third party
 import mysql.connector
 import numpy as np
 import scipy.stats
-# local
-from delphi_epidata import Epidata
-import epiweek as flu
-from fc_abstract import Forecaster
-import secrets
+
+# first party
+from ..forecasters.fc_abstract import Forecaster
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.operations.secrets as secrets
+import delphi.utils.epiweek as flu
 
 
 class Epicast(Forecaster):

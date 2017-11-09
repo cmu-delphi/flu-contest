@@ -3,7 +3,7 @@
 === Purpose ===
 ===============
 
-Plots cdc flu contest forecasts.
+Plots CDC flu contest forecasts.
 
 
 =================
@@ -23,14 +23,16 @@ Plots cdc flu contest forecasts.
   + First version (inspired by fluv_submission_check.py)
 """
 
-# built-in
+# standard library
 import argparse
+
+# third party
 import pylab as plt
-# external
-# local
-from delphi_epidata import Epidata
-import epiweek as flu
-from forecast_io import ForecastIO
+
+# first party
+from .forecast_io import ForecastIO
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.utils.epiweek as flu
 
 
 class Plotter:

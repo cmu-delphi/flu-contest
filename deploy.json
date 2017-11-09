@@ -1,39 +1,19 @@
 {
   "type": "delphi deploy config",
   "version": 1,
+  "paths": {
+    "auto_web": "/home/automation/public_html/public",
+    "package": "../flu_contest"
+  },
   "actions": [
 
-    "// imports",
-    {"type": "import", "dst": "../flu_contest/delphi_epidata.py"},
-    {"type": "import", "dst": "../flu_contest/emailer.py"},
-    {"type": "import", "dst": "../flu_contest/epidate.py"},
-    {"type": "import", "dst": "../flu_contest/epiweek.py"},
-    {"type": "import", "dst": "../flu_contest/neldermead.py"},
-    {"type": "import", "dst": "../flu_contest/secrets.py"},
+    "// note: archefilter is unused and is therefore no longer deployed",
 
     "// epicast",
     {
       "type": "move",
       "src": "src/epicast/",
-      "dst": "../flu_contest/",
-      "match": "^.*\\.py$",
-      "add-header-comment": true
-    },
-
-    "// archefilter",
-    {
-      "type": "move",
-      "src": "src/archefilter/",
-      "dst": "../flu_contest/",
-      "match": "^.*\\.py$",
-      "add-header-comment": true
-    },
-
-    "// automatic forecast submission",
-    {
-      "type": "move",
-      "src": "src/main/",
-      "dst": "../flu_contest/",
+      "dst": "[[package]]/epicast/",
       "match": "^.*\\.py$",
       "add-header-comment": true
     },
@@ -42,8 +22,32 @@
     {
       "type": "move",
       "src": "src/forecasters/",
-      "dst": "../flu_contest/",
+      "dst": "[[package]]/forecasters/",
       "match": "^.*\\.py$",
+      "add-header-comment": true
+    },
+
+    "// automatic forecast submission",
+    {
+      "type": "move",
+      "src": "src/main/",
+      "dst": "[[package]]/main/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
+    },
+
+    "// receiving uploaded forecasts",
+    {
+      "type": "move",
+      "src": "src/uploads/",
+      "dst": "[[package]]/uploads/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
+    },
+    {
+      "type": "move",
+      "src": "src/uploads/upload_forecast.php",
+      "dst": "[[auto_web]]/flu_contest/upload_forecast.php",
       "add-header-comment": true
     },
 
@@ -51,28 +55,14 @@
     {
       "type": "move",
       "src": "src/utils/",
-      "dst": "../flu_contest/",
+      "dst": "[[package]]/utils/",
       "match": "^.*\\.py$",
       "add-header-comment": true
     },
     {
       "type": "move",
       "src": "src/utils/forecast_plots.html",
-      "dst": "/home/automation/public_html/public/forecast_plots/index.html",
-      "add-header-comment": true
-    },
-
-    "// receiving uploaded forecasts",
-    {
-      "type": "move",
-      "src": "src/uploads/upload_forecast.py",
-      "dst": "../flu_contest/upload_forecast.py",
-      "add-header-comment": true
-    },
-    {
-      "type": "move",
-      "src": "src/uploads/upload_forecast.php",
-      "dst": "/home/automation/public_html/public/flu_contest/upload_forecast.php",
+      "dst": "[[auto_web]]/forecast_plots/index.html",
       "add-header-comment": true
     }
 

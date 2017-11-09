@@ -18,16 +18,18 @@ to make sure the correct data has been recorded.
   + first version
 """
 
-# built-in
+# standard library
 import argparse
 import datetime
 import json
 import urllib.parse
 import re
-# external
+
+# third party
 import requests
-# local
-from forecast_io import ForecastIO
+
+# first party
+from .forecast_io import ForecastIO
 
 
 def submit(email, password, filename, date=None, insane=False):

@@ -3,7 +3,8 @@
 === Purpose ===
 ===============
 
-Creates submissions for Epicast and Archefilter.
+Creates submissions for Epicast. This program also used to create Archefilter
+submissions.
 
 
 =================
@@ -19,15 +20,12 @@ Creates submissions for Epicast and Archefilter.
   * original version (combines make_epicast_submission.py and driver.py)
 """
 
-# built-in
-# external
-# local
-from epidate import EpiDate
-#from fc_archefilter import Archefilter
-from fc_baseline import Baseline
-from fc_epicast import Epicast
-from fc_hybrid import Hybrid
-from forecast_io import ForecastIO
+# first party
+from ..epicast.fc_epicast import Epicast
+from ..forecasters.fc_baseline import Baseline
+from ..forecasters.fc_hybrid import Hybrid
+from ..utils.forecast_io import ForecastIO
+from delphi.utils.epidate import EpiDate
 
 
 SEASON = 2017

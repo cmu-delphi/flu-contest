@@ -51,18 +51,20 @@ uploading of identical files.
   + first version
 """
 
-# built-in
+# standard library
 import os.path
-# external
+
+# third party
 import mysql.connector
-# local
-import secrets
-import submission_loader
+
+# first party
+from ..utils.submission_loader import load_submission
+import delphi.operations.secrets as secrets
 
 
 def handle_upload(filename):
   try:
-    submission_loader.load_submission(filename, verbose=True)
+    load_submission(filename, verbose=True)
   except Exception as ex:
     return 'failed to upload submission (%s)' % str(ex), -1
   return 'looks ok', 1

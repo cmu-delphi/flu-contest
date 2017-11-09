@@ -12,8 +12,9 @@ import os
 import re
 
 # first party
-from forecast import Forecast
-from forecast_meta import Locations, Targets, Types
+from .forecast import Forecast
+from .forecast_meta import Locations, Targets, Types
+import delphi.utils.epiweek
 
 
 class ForecastIO:

@@ -1,4 +1,12 @@
 """
+==================
+=== Deprecated ===
+==================
+
+As of 2017-11-09, this file is no longer used. The ArcheFilter forecasting
+system was only used for the 2015--2016 flu season.
+
+
 ===============
 === Purpose ===
 ===============

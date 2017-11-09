@@ -20,20 +20,22 @@ The abstract base class of all forecasting systems.
   + first version
 """
 
-# built-in
+# standard library
 import abc
 from datetime import datetime
 import math
 from statistics import median_low
-# external
+
+# third party
 import numpy as np
 import numpy.random as random
 import scipy.stats as stats
-# local
-import epiweek as flu
-from forecast import Forecast
-from forecast_io import ForecastIO
-from forecast_meta import Locations
+
+# first party
+from ..utils.forecast import Forecast
+from ..utils.forecast_io import ForecastIO
+from ..utils.forecast_meta import Locations
+import delphi.utils.epiweek as flu
 
 
 class Targets:

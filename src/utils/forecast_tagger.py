@@ -20,12 +20,13 @@ All other bins can be used to store 4 bits of data.
   + first version
 """
 
-# built-in
+# standard library
 import argparse
 import math
 import struct
-# local
-from forecast_io import Forecast
+
+# first party
+from .forecast_io import ForecastIO
 
 
 def double_to_long(x):
@@ -40,6 +41,8 @@ def get_values(fc):
   mask = 0xff
   not_mask = ((1 << 64) - 1) ^ mask
   prob_floor = 0.01
+  # TODO: use new forecast class
+  raise NotImplementedError()
   for r in fc.regions:
     for t in fc.targets:
       bins = fc.data[r][t]['dist']
@@ -126,8 +129,8 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   # read the tag
-  fc = Forecast.read(args.file)
+  fc = ForecastIO.load_csv(args.file)
   try:
     print('tag found:', read_tag_str(fc))
-  except:
-    print('tag not found')
+  except Exception as e:
+    print('tag not found (%s)' % str(e))

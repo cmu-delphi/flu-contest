@@ -17,9 +17,9 @@ future (including the current week).
   + First version
 """
 
-# local
-import epiweek as flu
-from fc_abstract import Forecaster
+# first party
+from .fc_abstract import Forecaster
+import delphi.utils.epiweek as flu
 
 
 class Hybrid(Forecaster):

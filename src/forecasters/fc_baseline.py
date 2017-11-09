@@ -19,12 +19,13 @@ for each target by randomly sampling trajectories from the combined models.
   + First version
 """
 
-# external
+# third party
 import numpy as np
-# local
-from delphi_epidata import Epidata
-import epiweek as flu
-from fc_abstract import Forecaster
+
+# first party
+from .fc_abstract import Forecaster
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.utils.epiweek as flu
 
 
 class Baseline(Forecaster):

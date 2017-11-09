@@ -63,27 +63,28 @@ respective command-line flags.
   * original version (loosely based on last year's fluv_submission.py)
 """
 
-# built-in
+# standard library
 import argparse
 import mimetypes
 import os
-import os.path
 import time
-# external
+
+# third party
 import mysql.connector
-# local
-from delphi_epidata import Epidata
-import emailer
-from epidate import EpiDate
-import epiweek as flu
-import flusight
-from forecast import Forecast
-from forecast_io import ForecastIO
-import forecast_tagger
-from plot_forecast import Plotter
-import secrets
-from submission_loader import load_submission
-from submissions import Submissions
+
+# first party
+from .submissions import Submissions
+import ..utils.flusight as flusight
+from ..utils.forecast import Forecast
+from ..utils.forecast_io import ForecastIO
+import ..utils.forecast_tagger as forecast_tagger
+from ..utils.plot_forecast import Plotter
+from ..utils.submission_loader import load_submission
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.operations.emailer as emailer
+import delphi.operations.secrets as secrets
+from delphi.utils.epidate import EpiDate
+import delphi.utils.epiweek as flu
 
 
 regions = ['nat'] + ['hhs%d' % i for i in range(1, 11)]

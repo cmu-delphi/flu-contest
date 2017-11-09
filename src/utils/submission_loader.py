@@ -41,14 +41,16 @@ json: a JSON string containing the full forecast (including all regions)
   * original version
 """
 
-# built-in
+# standard library
 import argparse
-# external
+
+# third party
 import mysql.connector
-# local
-import epiweek as flu
-from forecast_io import ForecastIO
-import secrets
+
+# first party
+from .forecast_io import ForecastIO
+import delphi.operations.secrets as secrets
+import delphi.utils.epiweek as flu
 
 
 def load_submission(file, system=None, epiweek=None, insane=False, test=False, verbose=False):

@@ -68,10 +68,11 @@ Notes:
   * Modularized the check/plot function (analyze)
 """
 
+# standard library
 import csv
 from datetime import datetime
 import json
-import os.path
+import os
 import re
 import statistics
 
