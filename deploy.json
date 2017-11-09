@@ -3,7 +3,7 @@
   "version": 1,
   "paths": {
     "auto_web": "/home/automation/public_html/public",
-    "package": "../flu_contest"
+    "package": "../delphi/flu_contest"
   },
   "actions": [
 
