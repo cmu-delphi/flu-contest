@@ -205,6 +205,10 @@ Dear %s,
 
 The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We ask that you please submit your forecasts by noon (ET) this coming %s.
 
+Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge.
+
+Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
+
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
 
 %s
@@ -221,6 +225,8 @@ Happy Forecasting!
   Dear %s,
 </p><p>
   The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We ask that you please submit your forecasts by noon (ET) this coming %s.
+</p><p>
+  Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 </p><p>
   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
 </p>%s<p>
