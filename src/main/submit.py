@@ -74,10 +74,10 @@ import mysql.connector
 
 # first party
 from .submissions import Submissions
-import ..utils.flusight as flusight
+from ..utils import flusight
 from ..utils.forecast import Forecast
 from ..utils.forecast_io import ForecastIO
-import ..utils.forecast_tagger as forecast_tagger
+from ..utils import forecast_tagger
 from ..utils.plot_forecast import Plotter
 from ..utils.submission_loader import load_submission
 from delphi.epidata.client.delphi_epidata import Epidata
