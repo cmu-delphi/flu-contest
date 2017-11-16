@@ -111,12 +111,12 @@ class Epicast(Forecaster):
       return (dist, point)
     return _forecast
 
-  def fetch_submissions(self, region, epiweek_now):
+  def fetch_submissions(self, ageGroup, epiweek_now):
     final_week = flu.join_epiweek(self.test_season + 1, 20)
     self.cur = self.cnx.cursor()
     self.cur.execute("""
     SELECT
-      u.`id` `user_id`, f.`epiweek`, f.`wili`
+      u.`id` `user_id`, f.`epiweek`, f.`value`
     FROM (
       SELECT
         u.*
@@ -134,17 +134,17 @@ class Epicast(Forecaster):
         d.`name` = '_debug' AND coalesce(p.`value`, d.`value`) = '0'
       ) u
     JOIN
-      `ec_fluv_submissions` s
+      `ec_fluv_submissions_hosp` s
     ON
       s.`user_id` = u.`id`
     JOIN
-      `ec_fluv_forecast` f
+      `ec_fluv_forecast_hosp` f
     ON
-      f.`user_id` = u.`id` AND f.`region_id` = s.`region_id` AND f.`epiweek_now` = s.`epiweek_now`
+      f.`user_id` = u.`id` AND f.`group_id` = s.`group_id` AND f.`epiweek_now` = s.`epiweek_now`
     JOIN
       `ec_fluv_regions` r
     ON
-      r.`id` = s.`region_id`
+      r.`id` = s.`group_id`
     WHERE
       r.`fluview_name` = %s AND s.`epiweek_now` = %s AND f.`epiweek` <= %s AND f.`wili` > 0
     ORDER BY
