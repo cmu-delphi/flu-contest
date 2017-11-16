@@ -142,14 +142,14 @@ class Epicast(Forecaster):
     ON
       f.`user_id` = u.`id` AND f.`group_id` = s.`group_id` AND f.`epiweek_now` = s.`epiweek_now`
     JOIN
-      `ec_fluv_regions` r
+      `ec_fluv_age_groups` a
     ON
-      r.`id` = s.`group_id`
+      a.`id` = s.`group_id`
     WHERE
-      r.`fluview_name` = %s AND s.`epiweek_now` = %s AND f.`epiweek` <= %s AND f.`wili` > 0
+      a.`fluview_name` = %s AND s.`epiweek_now` = %s AND f.`epiweek` <= %s AND f.`value` > 0
     ORDER BY
       u.`id` ASC, f.`epiweek` ASC
-    """, (region, epiweek_now, final_week))
+    """, (ageGroup, epiweek_now, final_week))
     submissions = {}
     for (user, epiweek, wili) in self.cur:
       if self.users is not None and user not in self.users:
@@ -162,7 +162,7 @@ class Epicast(Forecaster):
     expected_weeks = flu.delta_epiweeks(epiweek_now, final_week)
     for user in submissions:
       if len(submissions[user]) != expected_weeks:
-        print(' [EC] warning: missing data in user sumission [%d|%s|%d]' % (user, region, epiweek_now))
+        print(' [EC] warning: missing data in user sumission [%d|%s|%d]' % (user, ageGroup, epiweek_now))
       else:
         curves.append(submissions[user])
     return curves
@@ -181,17 +181,21 @@ class Epicast(Forecaster):
     self.cnx.commit()
     self.cnx.close()
 
-  def _train(self, region):
+  def _train(self, ageGroup):
     pass
 
-  def _forecast(self, region, epiweek):
+  def _forecast(self, ageGroup, epiweek):
     # season setup and sanity check
     ew1 = flu.join_epiweek(self.test_season, 40)
     ew2 = flu.join_epiweek(self.test_season + 1, 20)
     if not ew1 <= epiweek <= ew2:
       raise Exception('`epiweek` outside of `test_season`')
     # get past values (left half) from the Epidata API
-    epidata = Forecaster.Utils.decode(Epidata.fluview(region, Epidata.range(ew1, epiweek), issues=epiweek))
+#     epidata = Forecaster.Utils.decode(Epidata.fluview(region, Epidata.range(ew1, epiweek), issues=epiweek))
+# where is the locations var passed in in the following line? ('network_all)
+# for hosp, do we need both region ('network_all) and age_group?
+    epidata = Forecaster.Utils.decode(Epidata.flusurv(locations, Epidata.range(ew1, epiweek), issues=epiweek))
+    
     pinned = [row['wili'] for row in epidata]
     if len(pinned) != flu.delta_epiweeks(ew1, epiweek) + 1:
       raise Exception('missing ILINet data')
