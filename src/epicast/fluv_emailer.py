@@ -198,7 +198,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'New Data Available (Note: deadline moved to Monday 10AM)',
+        'subject': 'New Data Available (Note: Deadline Moved to Monday 10AM)',
         'text': '''
 Dear %s,
 
@@ -243,7 +243,7 @@ Happy Forecasting!
 # REMINDERS                                                                    #
 ################################################################################
       'reminders': {
-        'subject': 'Forecasts Needed (Reminder: deadline moved to Monday 10AM)',
+        'subject': 'Forecasts Needed (Reminder: Deadline Moved to Monday 10AM)',
         'text': '''
 Dear %s,
 
