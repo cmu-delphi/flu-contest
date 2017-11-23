@@ -219,7 +219,7 @@ Happy Thanksgiving!
   Happy Thanksgiving! We hope you have a wonderful week! The Delphi group would like to thank you for your contribution to our project, and for your participation in flu forecast that is dedicated to better the nation's public health. This year we have been getting more user inputs, and all progress we make is due to your contribution.
 </p><p>
 <b>Because of the holiday, this week's forecast will start on Monday, November 27, and is due on Wednesday, November 29 at 10:00AM. We will send out notification and reminder emails when the forecast starts. </b>
-</p>%s<p>
+</p><p>
   Thank you again for your participation, and good luck on your forecasts!
 </p><p>
   Happy Thanksgiving!
