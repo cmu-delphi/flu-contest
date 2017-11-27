@@ -198,35 +198,39 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'Happy Thanksgiving (Notification: This Week Deadline Moved to Wednesday 10AM)',
+        'subject': 'New Data Available (Note: Deadline Moved to Monday 10AM)',
         'text': '''
 Dear %s,
-
-
-Happy Thanksgiving! We hope you have a wonderful week! The Delphi group would like to thank you for your contribution to our project, and for your participation in flu forecast that is dedicated to better the nation's public health. This year we have been getting more user inputs, and all progress we make is due to your contribution.
-
-Because of the holiday, this week's forecast will start on Monday, November 27, and is due on Wednesday, November 29 at 10:00AM. We will send out notification and reminder emails when the forecast starts.
-
+The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Note that due to a change in the forecast submission schedule, we are now asking you to submit your forecasts by 10:00 AM (ET) this coming %s. 
+This new deadline will hold for the rest of the season. Thank you so much for your support and cooperation!
+Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
+To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
+%s
 Thank you again for your participation, and good luck on your forecasts!
-
-Happy Thanksgiving!
+Happy Forecasting!
 -The DELPHI Team
-        '''%(u[1]),
+        '''%(u[1], deadline_day, u[0], score_text),
         'html': '''
+
+
 <p>
   Dear %s,
 </p><p>
-  Happy Thanksgiving! We hope you have a wonderful week! The Delphi group would like to thank you for your contribution to our project, and for your participation in flu forecast that is dedicated to better the nation's public health. This year we have been getting more user inputs, and all progress we make is due to your contribution.
+  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Note that due to a change in the forecast submission schedule, we are now asking you to submit your forecasts by <b>10:00 AM (ET)</b> this coming %s. 
+  This new deadline will hold for the rest of the season. Thank you so much for your support and cooperation!
 </p><p>
-<b>Because of the holiday, this week's forecast will start on Monday, November 27, and is due on Wednesday, November 29 at 10:00AM. We will send out notification and reminder emails when the forecast starts. </b>
+  Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations. For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. 
+  Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 </p><p>
+  To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
+</p>%s<p>
   Thank you again for your participation, and good luck on your forecasts!
 </p><p>
-  Happy Thanksgiving!
+  Happy Forecasting!
 <br />
   -The DELPHI Team
 </p>
-        '''%(u[1]),
+        '''%(u[1], deadline_day, u[0], u[0], score_html),
       },
 ################################################################################
 # REMINDERS                                                                    #
@@ -237,7 +241,7 @@ Happy Thanksgiving!
 Dear %s,
 
 
-This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on %s. Note that due to a change in the forecast submission schedule, we are now moving our deadline to 10:00 AM Monday, and this will hold for the rest of the season. 
+This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on %s. Note that due to a change in the forecast submission schedule, the official deadline now is 10:00 AM Monday, and this will hold for the rest of the season. 
 Thank you so much for your support and cooperation!
 
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
