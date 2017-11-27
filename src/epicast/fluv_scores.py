@@ -1,129 +1,94 @@
-"""
-===============
-=== Purpose ===
-===============
-
-Scores Epicast FLUV users.
-
-
-=================
-=== Changelog ===
-=================
-
-2016-12-14
-  + use secrets
-2016-10-24
-  * update valid epiweeks based on 2016 flu contest
-2015-12-17
-  * complete rewrite of scoring, now based on ranking
-2015-12-04
-  * only scoring first four weeks (still linear weight decrease)
-  * added --user argument for debugging
-  * more lenient scoring when missing regions or entire weeks
-2015-11-13
-  * reformatted header and comments
-  * use database epicast2
-  * updated epiweek bounds for 2015-2016 season
-  * use SQL parameters instead of string formatting
-  * changed from weighted to unweighted regional mean
-2014-11-09
-  * replacing missing values with most recent forecast instead of zero
-"""
-
-# standard library
-import argparse
-
-# third party
+from delphi_epidata import Epidata
 import mysql.connector
+import secrets
+import epiweek as epi_utils
 
-# first party
-import delphi.operations.secrets as secrets
-from delphi.utils.epiweek import *
-
-
-# Args and usage
-parser = argparse.ArgumentParser()
-parser.add_argument('-w', '--epiweek', action='store', type=int, help="epiweek override (yyyyww); default most recent epiweek")
-parser.add_argument('-v', '--verbose', action='store_const', default=False, const=True, help="show extra output")
-parser.add_argument('-t', '--test', action='store_const', default=False, const=True, help="test mode, don't update the database")
-parser.add_argument('-u', '--user', action='store', default=None, type=int, help="show extra output for a specific user")
-args = parser.parse_args()
-
-# DB stuff
+# Connect to epicast2 database
 u, p = secrets.db.epi
 cnx = mysql.connector.connect(user=u, password=p, database='epicast2')
-cur = cnx.cursor()
+cur = cnx.cursor(buffered=True)
 
-# Get the epiweek
-if args.epiweek is None:
-  cur.execute('SELECT max(`epiweek`) `epiweek` FROM ec_fluv_history')
-  for (epiweek,) in cur:
-    pass
-else:
-  epiweek = args.epiweek
-if epiweek < 201641 or epiweek > 201721 or not check_epiweek(epiweek):
-  raise Exception('invalid epiweek %d' % (epiweek))
-print('latest epiweek: %d' % (epiweek))
 
-# Calculate the expected length of each forecast (and other important dates)
-season_start, season_end = get_season(epiweek)
-if season_start is None:
-  raise Exception('this is the offseason')
-if epiweek <= season_start:
-  raise Exception('epiweek <= season_start')
-expected_weeks = delta_epiweeks(season_start, epiweek) + 1
-print('current season: %d-%d (currently %d weeks in)' % (season_start // 100, season_end // 100, expected_weeks))
-
-# Get the history
+# Get ground truth
 history = {}
-cur.execute("""
-  SELECT `region_id`, `epiweek`, `wili` FROM ec_fluv_history WHERE `epiweek` BETWEEN %s AND %s ORDER BY `region_id` ASC, `epiweek` ASC
-""", (season_start, epiweek))
-for (r, ew, wili) in cur:
-  if r not in history:
-    history[r] = {}
-  history[r][ew] = wili
+regions = ["nat","hhs1","hhs2","hhs3","hhs4","hhs5","hhs6","hhs7","hhs8","hhs9","hhs10","ga","pa","dc","tx","or"]
+# for 2017-18 season, 201744 is the first ground truth data we get after the competition starts (i.e., users forecasted for it in 201743)
+#############################################################
+season_start, season_end = 201744, 201820
+
+for r in range(1, len(regions)+1):
+  history[r] = {}
+  rows = Epidata.check(Epidata.fluview(regions[r-1], Epidata.range(season_start, season_end)))
+  truth = [(row['epiweek'], row['wili']) for row in rows]
+  availableWeeks = [row[0] for row in truth]
+  for row in truth:
+    (epiweek, wili) = row
+    history[r][epiweek] = wili
+    print(regions[r-1], epiweek, wili)
+
+epiweek = availableWeeks[-1]
+print("epiweek", epiweek)
+if (epiweek == 201801): forecast_made = 201752
+else: forecast_made = epiweek-1
+
+# debug print
+print("availableWeeks", availableWeeks)
+expected_weeks = epi_utils.delta_epiweeks(season_start, epiweek) + 1
 num_weeks = len(history[1])
 print('loaded history for %d weeks' % (num_weeks))
+# #######################################################
 if num_weeks != expected_weeks:
   raise Exception('expected %d weeks of history, but found %d weeks instead' % (expected_weeks, num_weeks))
 
-# Get the forecasts
-forecast = {}
-for r in range(1, 12):
-  forecast[r] = {}
-  for ew1 in range_epiweeks(season_start, season_end, inclusive=False):
-    forecast[r][ew1] = {}
-    for ew2 in range_epiweeks(add_epiweeks(ew1, 1), season_end, inclusive=True):
-      forecast[r][ew1][ew2] = {}
-cur.execute("""
-  select u.id, coalesce(p.value, d.value) debug from ec_fluv_users u join ec_fluv_defaults d on d.name = '_debug' left join ec_fluv_user_preferences p on p.user_id = u.id and p.name = d.name where coalesce(p.value, d.value) = 0 order by u.id asc
-""")
+
+# Get all user_id
+cur.execute("select id from ec_fluv_users") # maybe need to investigate more about _debug???
 num_users = 0
 user_ids = []
-for (u, d) in cur:
+for user_id in cur:
   num_users += 1
-  user_ids.append(u)
-  for r in forecast:
-    for ew1 in forecast[r]:
-      for ew2 in forecast[r][ew1]:
-        forecast[r][ew1][ew2][u] = 0
+  user_ids.append(user_id[0])
+
+
+# Get the forecasts
+forecast = {}
+for r in range(1, len(regions)+1): 
+  # r is region_id
+  forecast[r] = {}
+  ################################# might need to check this season_end and inclusive_false at the end of the season, season_start-1?
+  for ew1 in epi_utils.range_epiweeks(season_start-1, season_end, inclusive=False):
+    forecast[r][ew1] = {}
+    for ew2 in epi_utils.range_epiweeks(epi_utils.add_epiweeks(ew1, 1), season_end, inclusive=True):
+      forecast[r][ew1][ew2] = {}
+      for user_id in user_ids:
+        forecast[r][ew1][ew2][user_id] = -200
+
+
 cur.execute("""
-  select f.user_id, f.region_id, f.epiweek_now, f.epiweek, f.wili from ec_fluv_forecast f where f.epiweek_now >= %s and f.epiweek <= %s
-""", (season_start, season_end))
+  select f.user_id, f.region_id, f.epiweek_now, f.epiweek, f.wili from ec_fluv_forecast f 
+  JOIN ec_fluv_submissions s ON f.user_id = s.user_id AND f.region_id = s.region_id AND
+  f.epiweek_now = s.epiweek_now where f.epiweek_now >= 201743 and f.epiweek <= 201820""")
+
 num_predictions = 0
 for (u, r, ew1, ew2, wili) in cur:
-  try:
-    forecast[r][ew1][ew2][u] = wili
-    num_predictions += 1
-  except:
-    print(u, r, ew1, ew2, wili)
-    raise Exception()
-    pass
+  # we asked users to forecast 14 regions in week 201743 and 16 regions from 201744
+  if ((ew1 == 201743 and r <= len(regions)-2) or (ew1 > 201743 and r <= 16)):  
+  # if ((ew1 == 201743 and r <= len(regions)) or (ew1 > 201743 and r <= 14)):  
+    try:
+      forecast[r][ew1][ew2][u] = wili
+      num_predictions += 1
+    except:
+      # print(u, r, ew1, ew2, wili)
+      raise Exception()
+      pass
 print('loaded %d predictions for %d users' % (num_predictions, num_users))
+
 
 # rank users in each cell by absolute error
 scores = {}
+print("user_ids in the order of best accuracy to worst accuracy")
+print("i: week during which users submitted input")
+print("j: week for which we have ground truth")
 for r in forecast:
   scores[r] = {}
   for ew1 in forecast[r]:
@@ -134,10 +99,17 @@ for r in forecast:
       for u in forecast[r][ew1][ew2]:
         if ew2 in history[r]:
           error = abs(forecast[r][ew1][ew2][u] - history[r][ew2])
+          # print("u",u,"r",r,"ew1",ew1,"ew2",ew2,"forecast",forecast[r][ew1][ew2][u],"r",r,"truth",history[r][ew2],"error", error)
         else:
           error = 0
         ranking.append({ 'u': u, 'error': error, 'rank': 0, 'score': 0})
       ranking = sorted(ranking, key=lambda x: x['error'])
+
+      # debug print
+      if (ew2 == 201745):
+        print(regions[r-1],"i:", ew1, "j:",ew2, [y['u'] for y in ranking])
+
+
       last_error, last_rank = 0, 1
       for (i, row) in enumerate(ranking):
         new_error, new_rank = row['error'], i + 1
@@ -146,21 +118,21 @@ for r in forecast:
         else:
           last_rank, last_error = new_rank, new_error
         row['rank'] = new_rank
+        # if (ew2 == 201744):
+          # print("for week 201744,","r",r,"u",row['u'], "rank", row['rank'])
         row['score'] = 1 / row['rank']
       for row in ranking:
         u = row['u']
         scores[r][ew1][ew2][u] = row
-if args.user is not None:
-  row = scores[1][season_start][epiweek][args.user]
-  print('[user %d scored %.3f (#%d) on %d forecasting %d (nat)]' % (args.user, row['score'], row['rank'], season_start, epiweek))
 
 # helper to get scores on a column (different ew1, same ew2) of the score table
+# weekly score is the sum of all (ew1, epiweek) scores
 def get_weekly_score(u, ew2):
   max_score, min_score = 0, 0
   user_score = 0
-  for ew1 in range_epiweeks(season_start, ew2, inclusive=False):
-    weight = 1 / delta_epiweeks(ew1, ew2)
-    for r in range(1, 12):
+  for ew1 in epi_utils.range_epiweeks(201743, ew2, inclusive=False):
+    weight = 1 / epi_utils.delta_epiweeks(ew1, ew2)
+    for r in range(1, len(regions)+1):
       max_score += weight
       min_score += (1 / num_users) * weight
       user_score += scores[r][ew1][ew2][u]['score'] * weight
@@ -172,33 +144,67 @@ def get_weekly_score(u, ew2):
   score = 500 + 500 * score
   return score
 
+# def get_weekly_score(u, ew2):
+#   max_score, min_score = 0, 0
+#   user_score = 0
+#   # for ew1 in epi_utils.range_epiweeks(201743, ew2, inclusive=False):
+#   ew1 = 201743
+#   ew2 = 201744
+#   weight = 1 / epi_utils.delta_epiweeks(ew1, ew2)
+#   delta = (1 / num_users) * weight
+#   # print("weight", weight)
+#   # print("delta", delta)
+
+#   for r in range(1, len(regions)+1):
+
+#     max_score += weight
+#     min_score += delta
+#     user_score += scores[r][ew1][ew2][u]['score'] * weight
+#     # print("r", r, "u", u, "row_score", scores[r][ew1][ew2][u]['score'])
+#   # print("r", r, "u", u, "user_score", user_score)
+    
+#   # normalized
+#   score = (user_score - min_score) / (max_score - min_score)
+#   # print("u", u, "normalized score", score)
+#   # boosted
+#   score = 1 - ((1 - score) ** 2)
+#   # print("u", u, "boosted score", score)
+#   # rescaled
+#   score = 500 + 500 * score
+#   # print("u", u, "rescaled score", score)
+#   return score
+
+
+
 # calculate total and weekly score for each user
 for u in user_ids:
 
   user_scores = []
   # compute weekly scores
-  for ew2 in range_epiweeks(season_start, epiweek):
-    issue = add_epiweeks(ew2, 1)
-    # weekly score is the sum of all (ew1, epiweek) scores
-    score = get_weekly_score(u, issue)
+  for ew2 in epi_utils.range_epiweeks(season_start, availableWeeks[-1], inclusive=True):
+    score = get_weekly_score(u, ew2)
     user_scores.append(score)
-    if u == args.user:
-      print('[user %d scored %.3f on issue %d]' % (args.user, score, issue))
+    
 
   # total score and last week's score
   total, last = sum(user_scores), user_scores[-1]
   print('user %d: total=%.3d last=%.3f' % (u, total, last))
+
+
+# for u in user_ids:
+#   user_scores = []
+#   score = get_weekly_score(u, 201744)
+#   user_scores.append(score)
+#   # total score and last week's score
+#   total, last = sum(user_scores), user_scores[-1]
+#   print('user %d: total=%.3d last=%.3f' % (u, total, last))
+
 
   # Save to database
   cur.execute("""
     INSERT INTO ec_fluv_scores (`user_id`, `total`, `last`, `updated`) VALUES(%s, %s, %s, now()) ON DUPLICATE KEY UPDATE `total` = %s, `last` = %s, `updated` = now()
   """, (u, total, last, total, last))
 
-# Cleanup
-if args.test:
-  print('test mode - not committing')
-else:
-  cnx.commit()
-  print('scores updated')
+cnx.commit()
 cur.close()
 cnx.close()
