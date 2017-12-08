@@ -8,7 +8,6 @@ backfill model (weekly variance) of the past with an empirical model (weekly
 mean and variance) of the future. Point predictions and distributions are built
 for each target by randomly sampling trajectories from the combined models.
 
-
 =================
 === Changelog ===
 =================
@@ -19,20 +18,21 @@ for each target by randomly sampling trajectories from the combined models.
   + First version
 """
 
+
 # third party
 import numpy as np
 
 # first party
 from .fc_abstract import Forecaster
-from delphi.epidata.client.delphi_epidata import Epidata
+from delphi.delphi_epidata.client.delphi_epidata import Epidata
 import delphi.utils.epiweek as flu
-
+from ..utils.forecast_type import ForecastType
 
 class Baseline(Forecaster):
 
-  def __init__(self, test_season, locations, num_samples, backfill_weeks=10, do_sampling=True):
+  def __init__(self, test_season, locations, num_samples, forecast_type, backfill_weeks=10, do_sampling=True):
     method = '%d%d' % (backfill_weeks is not None, do_sampling)
-    super().__init__('fc-baseline-%s' % method, test_season, locations)
+    super().__init__('fc-baseline-%s' % method, test_season, locations, forecast_type)
     self.num_samples = num_samples
     self.backfill_weeks = backfill_weeks
     self.do_sampling = do_sampling
@@ -40,6 +40,7 @@ class Baseline(Forecaster):
     self.emp_mean = {}
     self.emp_var = {}
     self.emp_curves = {}
+    self.forecast_type = forecast_type
 
   def _train(self, region):
     if region in self.bf_var:
@@ -60,7 +61,12 @@ class Baseline(Forecaster):
     seasons = set([flu.split_epiweek(ew)[0] for ew in start_weeks if ew is not None])
     for s in seasons:
       ew1 = flu.join_epiweek(s + 0, 40)
-      ew2 = flu.add_epiweeks(ew1, 37)
+      if self.forecast_type == ForecastType.WILI:
+        ew2 = flu.add_epiweeks(ew1, 37)
+      else:
+        ew2 = flu.add_epiweeks(ew1, 29)
+      # print("stable: ", stable)
+      # print("range_epiweeks: ", [i for i in flu.range_epiweeks(ew1, ew2)])
       curve = [stable[ew] for ew in flu.range_epiweeks(ew1, ew2)]
       curves.append(curve)
     self.emp_mean[region] = np.mean(curves, axis=0)
@@ -82,7 +88,8 @@ class Baseline(Forecaster):
     ew1 = flu.join_epiweek(self.test_season + 0, 40)
     ew2 = flu.join_epiweek(self.test_season + 1, 24)
     num_weeks = flu.delta_epiweeks(ew1, ew2)
-    observed = self._get_current(region, epiweek)
+    observed = self._get_current(region, epiweek, self.forecast_type)
+
     mean, var = self.emp_mean[region].copy(), self.emp_var[region].copy()
     for ew in flu.range_epiweeks(ew1, flu.add_epiweeks(epiweek, 1)):
       i = flu.delta_epiweeks(ew1, ew)
@@ -104,8 +111,12 @@ class Baseline(Forecaster):
       ew1 = flu.join_epiweek(s + 0, 40)
       ew2 = flu.join_epiweek(s + 1, 20)
       ranges.append(Epidata.range(ew1, ew2))
-    epidata = Forecaster.Utils.decode(Epidata.fluview(region, ranges, lag=lag))
-    return dict([(row['epiweek'], row['wili']) for row in epidata])
+    if self.forecast_type == ForecastType.WILI:
+        epidata = Forecaster.Utils.decode(Epidata.fluview(region, ranges, lag=lag))
+        return dict([(row['epiweek'], row['wili']) for row in epidata])
+    else:
+        epidata = Forecaster.Utils.decode(Epidata.flusurv('network_all', ranges, lag=lag))
+        return dict([(row['epiweek'], row[region]) for row in epidata])
 
   def _get_stable(self, region):
     ranges = []
@@ -115,15 +126,27 @@ class Baseline(Forecaster):
       ew1 = flu.join_epiweek(s, 40)
       ew2 = flu.add_epiweeks(ew1, 37)
       ranges.append(Epidata.range(ew1, ew2))
-    epidata = Forecaster.Utils.decode(Epidata.fluview(region, ranges))
-    return dict([(row['epiweek'], row['wili']) for row in epidata])
 
-  def _get_current(self, region, epiweek):
+    if self.forecast_type == ForecastType.WILI:
+        epidata = Forecaster.Utils.decode(Epidata.fluview(region, ranges))
+        return dict([(row['epiweek'], row['wili']) for row in epidata])
+    else:
+        epidata = Forecaster.Utils.decode(Epidata.flusurv('network_all', ranges))
+        return dict([(row['epiweek'], row[region]) for row in epidata])
+
+
+  def _get_current(self, region, epiweek, forecast_type):
     ew1 = flu.join_epiweek(self.test_season + 0, 40)
     ew2 = flu.join_epiweek(self.test_season + 1, 20)
     weeks = Epidata.range(ew1, ew2)
-    epidata = Forecaster.Utils.decode(Epidata.fluview(region, weeks, issues=epiweek))
-    data = [row['wili'] for row in epidata]
+    if self.forecast_type == ForecastType.WILI:
+        epidata = Forecaster.Utils.decode(Epidata.fluview(region, weeks, issues=epiweek))
+        data = [row['wili'] for row in epidata]
+        # print (data)
+    else:
+        epidata = Forecaster.Utils.decode(Epidata.flusurv('network_all', weeks, issues=epiweek))
+        data = [row[region] for row in epidata]
+
     if len(data) != flu.delta_epiweeks(ew1, epiweek) + 1:
       raise Exception('missing data')
     return data

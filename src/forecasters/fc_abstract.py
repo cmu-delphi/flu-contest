@@ -33,9 +33,9 @@ import scipy.stats as stats
 
 # first party
 from ..utils.forecast import Forecast
-from ..utils.forecast_io import ForecastIO
 from ..utils.forecast_meta import Locations
 import delphi.utils.epiweek as flu
+from ..utils.forecast_type import ForecastType
 
 
 class Targets:
@@ -195,7 +195,7 @@ class Forecaster(abc.ABC):
       zeros = np.zeros(curves.shape)
       return np.fmax(curves, zeros)
 
-  def __init__(self, name, test_season, locations, min_week_prob=0.002,
+  def __init__(self, name, test_season, locations, forecast_type, min_week_prob=0.002,
     min_wili_prob=0.002, forecast_weeks=Utils.get_week_forecast,
     forecast_wili=Utils.get_wili_forecast, smooth_weeks_bw=1, smooth_wili_bw=1):
     """
@@ -237,7 +237,9 @@ class Forecaster(abc.ABC):
     self.forecast_wili = forecast_wili
     self.smooth_weeks_bw = smooth_weeks_bw
     self.smooth_wili_bw = smooth_wili_bw
+    self.forecast_type = forecast_type
 
+  # def forecast(self, epiweek, forecast_type):
   def forecast(self, epiweek):
     """
     `epiweek`: the most recent epiweek for which ILINet data is available
@@ -255,12 +257,15 @@ class Forecaster(abc.ABC):
       raise Exception('unable to forecast week %02d' % week)
 
     # initialize forecast
-    forecast = Forecast(self.test_season, datetime.now(), self.name, epiweek)
+    forecast = Forecast(self.test_season, datetime.now(), self.name, epiweek, self.forecast_type)
 
     # aliases for readability
     num_week_bins = forecast.season_length
     num_wili_bins = forecast.num_ili_bins
     wili_bin_size = forecast.ili_bin_size
+
+    # if (forecast_type == ForecastType.HOSP):
+    #     num_wili_bins = 601
 
     # uniform blending weights
     week_weight = self.min_week_prob * (num_week_bins + 1)  # include `none` "bin"
@@ -295,7 +300,9 @@ class Forecaster(abc.ABC):
       # forecast each target
       allow_no_pw = self.test_season < 2016
       if Locations.is_region(region):
+        # skip onset for states and hospitalization, and do it only for regions
         onset = self.forecast_weeks(first_epiweek, num_week_bins, onsets, week_weight, self.smooth_weeks_bw, True)
+
       peakweek = self.forecast_weeks(first_epiweek, num_week_bins, peakweeks, week_weight, self.smooth_weeks_bw, allow_no_pw)
       peak = self.forecast_wili(wili_bin_size, num_wili_bins, peaks, wili_weight, self.smooth_wili_bw)
       x1 = self.forecast_wili(wili_bin_size, num_wili_bins, x1s, wili_weight, self.smooth_wili_bw)

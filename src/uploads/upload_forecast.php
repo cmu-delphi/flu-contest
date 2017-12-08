@@ -13,7 +13,7 @@ $hmacSecret = Secrets::$flucontest['hmac'];
 $dbUser = Secrets::$db['auto'][0];
 $dbPass = Secrets::$db['auto'][1];
 $dbHost = 'localhost';
-$dbPort = 3306;
+$dbPort = 3307;
 $dbName = 'utils';
 $dbh = mysql_connect("{$dbHost}:{$dbPort}", $dbUser, $dbPass);
 if($dbh) {

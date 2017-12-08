@@ -91,6 +91,13 @@ class Locations:
     (False, 'ord', 'Chicago'),
     (False, 'lax', 'Los Angeles'),
     (False, 'jfk', 'New York City'),
+    # age groups (hospitalization forecast)
+    (False, 'rate_age_0', '0-4 yr'),
+    (False, 'rate_age_1', '5-17 yr'),
+    (False, 'rate_age_2', '18-49 yr'),
+    (False, 'rate_age_3', '50-64 yr'),
+    (False, 'rate_age_4', '65 + yr'),
+    (False, 'rate_overall', 'Overall'),
   ):
     __is_region[delphi_name] = __is_region[display_name] = is_region
     __delphi_to_display[delphi_name] = display_name

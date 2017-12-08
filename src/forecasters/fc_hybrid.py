@@ -20,17 +20,19 @@ future (including the current week).
 # first party
 from .fc_abstract import Forecaster
 import delphi.utils.epiweek as flu
+from ..utils.forecast_type import ForecastType
 
 
 class Hybrid(Forecaster):
 
-  def __init__(self, name, past, future):
+  def __init__(self, name, past, future, forecast_type):
     if past.test_season != future.test_season:
       raise Exception('`past` and `future` trained on different seasons')
-    super().__init__(name, past.test_season, past.locations)
+    super().__init__(name, past.test_season, past.locations, forecast_type)
     self.past = past
     self.future = future
     self._callback = None
+    self.forecast_type = forecast_type
 
   def _init(self):
     self.past.open()

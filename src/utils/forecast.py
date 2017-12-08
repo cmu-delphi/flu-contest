@@ -3,7 +3,7 @@
 # first party
 from .forecast_location import ForecastLocation
 from .forecast_meta import Locations
-
+from .forecast_type import ForecastType
 
 class Forecast:
 
@@ -28,7 +28,7 @@ class Forecast:
       forecast.add_forecast(forecast2.get_forecast(location))
     return forecast
 
-  def __init__(self, season, timestamp, team, epiweek):
+  def __init__(self, season, timestamp, team, epiweek, forecast_type = ForecastType.WILI):
     self.season = season
     self.timestamp = timestamp
     self.team = team
@@ -36,8 +36,11 @@ class Forecast:
     self.forecasts = {}
     self.ordered_locations = []
     self.season_length = 33
-    self.num_ili_bins = 131
     self.ili_bin_size = 0.1
+
+    self.num_ili_bins = 131
+    if (forecast_type == ForecastType.HOSP):
+        self.num_ili_bins = 601
 
   def get_metadata(self):
     return (self.season, self.timestamp, self.team, self.epiweek)
