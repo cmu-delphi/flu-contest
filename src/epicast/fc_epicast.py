@@ -99,7 +99,7 @@ class Epicast(Forecaster):
       possibilities = [i for i in indices if i is not None]
       if len(possibilities) == 0:
         possibilities = [0]
-      point = flu.add_epiweeks(first_epiweek, int(median_low(possibilities)))
+      point = flu.add_epiweeks(first_epiweek, int(np.median(possibilities)))
       return (dist, none, point)
     return _forecast
 
