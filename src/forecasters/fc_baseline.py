@@ -24,7 +24,8 @@ import numpy as np
 
 # first party
 from .fc_abstract import Forecaster
-from delphi.delphi_epidata.client.delphi_epidata import Epidata
+# from delphi.delphi_epidata.client.delphi_epidata import Epidata
+from delphi.epidata.client.delphi_epidata import Epidata
 import delphi.utils.epiweek as flu
 from ..utils.forecast_type import ForecastType
 
