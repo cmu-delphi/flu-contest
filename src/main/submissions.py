@@ -40,7 +40,7 @@ class Submissions:
   def run_epicast(self, epiweek, min_week_prob, min_wili_prob):
     future = Epicast(SEASON, self.past.locations, ForecastType.WILI, verbose=True)
 
-    forecaster = Hybrid('delphi-epicast', self.past, future)
+    forecaster = Hybrid('delphi-epicast', self.past, future, ForecastType.WILI)
     forecaster.min_week_prob = min_week_prob
     forecaster.min_wili_prob = min_wili_prob
     forecaster.smooth_weeks_bw = 0
