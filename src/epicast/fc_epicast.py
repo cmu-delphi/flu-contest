@@ -43,12 +43,13 @@ from ..forecasters.fc_abstract import Forecaster
 from delphi.epidata.client.delphi_epidata import Epidata
 import delphi.operations.secrets as secrets
 import delphi.utils.epiweek as flu
+from ..utils.forecast_type import ForecastType
 
 
 class Epicast(Forecaster):
 
-  def __init__(self, test_season, locations, verbose=False, users=None):
-    super().__init__('epicast', test_season, locations, smooth_weeks_bw=0, smooth_wili_bw=0)
+  def __init__(self, test_season, locations, forecast_type, verbose=False, users=None):
+    super().__init__('epicast', test_season, locations, forecast_type, smooth_weeks_bw=0, smooth_wili_bw=0)
     self.verbose = verbose
     self.users = users
 
