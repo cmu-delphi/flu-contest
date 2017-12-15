@@ -202,7 +202,7 @@ You can find the leaderboards at http://epicast.org/scores.php
         'text': '''
 Dear %s,
 The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by 10:00 AM (ET) this coming %s. 
-This deadline will hold for the rest of the season. Thank you so much for your support and cooperation!
+Thank you so much for your support and cooperation!
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
 %s
@@ -217,7 +217,7 @@ Happy Forecasting!
   Dear %s,
 </p><p>
   The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming %s. 
-  This deadline will hold for the rest of the season. Thank you so much for your support and cooperation!
+  Thank you so much for your support and cooperation!
 </p><p>
   Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations. For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. 
   Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
