@@ -236,12 +236,12 @@ Happy Forecasting!
 # REMINDERS                                                                    #
 ################################################################################
       'reminders': {
-        'subject': 'Forecasts Needed (Reminder: Deadline Monday 10AM)',
+        'subject': 'Forecasts Needed (Deadline Extended to Wednesday 10AM)',
         'text': '''
 Dear %s,
 
 
-This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
+This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Wednesday (due to the Christmas holiday we are extending the deadline for this week). 
 Thank you so much for your support and cooperation!
 
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
@@ -255,7 +255,7 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
+  This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Wednesday (due to the Christmas holiday we are extending the deadline for this week). 
 Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
