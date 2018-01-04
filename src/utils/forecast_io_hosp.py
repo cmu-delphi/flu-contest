@@ -12,8 +12,8 @@ import os
 import re
 
 # first party
-from .forecast import Forecast
-from .forecast_meta import Locations, Targets, Types
+from delphi.flu_contest.utils.forecast import Forecast
+from delphi.flu_contest.utils.forecast_meta import Locations, Targets, Types
 
 
 class ForecastIO:

@@ -48,7 +48,7 @@ import argparse
 import mysql.connector
 
 # first party
-from .forecast_io import ForecastIO
+from delphi.flu_contest.utils.forecast_io import ForecastIO
 import delphi.operations.secrets as secrets
 import delphi.utils.epiweek as flu
 
@@ -125,8 +125,8 @@ def load_submission(file, system=None, epiweek=None, insane=False, test=False, v
   log('forecast loaded')
 
 
-def main():
-  # args and usage
+def get_argument_parser():
+  """Set up command line arguments and usage."""
   parser = argparse.ArgumentParser()
   parser.add_argument('file', help='the submission file (*.xlsx or *.csv)')
   parser.add_argument('-s', '--system', help='system override (ex: af, eb, ec, sp, st)')
@@ -134,7 +134,14 @@ def main():
   parser.add_argument('-i', '--insane', action='store_true', help='skip sanity check and ignore errors')
   parser.add_argument('-t', '--test', action='store_true', help='test only - do not commit')
   parser.add_argument('-v', '--verbose', action='store_true', help='show more output')
-  args = parser.parse_args()
+  return parser
+
+
+def main():
+  """Run this script from the command line."""
+
+  # args and usage
+  args = get_argument_parser().parse_args()
 
   # load the submission
   load_submission(args.file, args.system, args.epiweek, args.insane, args.test, args.verbose)

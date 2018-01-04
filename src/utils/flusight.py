@@ -29,7 +29,7 @@ import re
 import requests
 
 # first party
-from .forecast_io import ForecastIO
+from delphi.flu_contest.utils.forecast_io import ForecastIO
 
 
 def submit(email, password, filename, date=None, insane=False):

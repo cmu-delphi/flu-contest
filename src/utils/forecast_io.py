@@ -12,8 +12,10 @@ import os
 import re
 
 # first party
-from .forecast import Forecast
-from .forecast_meta import Locations, Targets, Types
+from delphi.flu_contest.utils.forecast import Forecast
+from delphi.flu_contest.utils.forecast_meta import Locations, Targets, Types
+from delphi.utils.epidate import EpiDate
+import delphi.utils.epiweek as Epiweek
 
 
 class ForecastIO:
@@ -69,22 +71,53 @@ class ForecastIO:
     fc.set_single_value(target, index, value)
 
   @staticmethod
+  def extract_epiweek_and_team(filename):
+    """
+    Extract the submission epiweek (epiweek of most recently published report)
+    and the team name from the file name of a flu contest submission.
+
+    The return value is a tuple of:
+      1. the submission epiweek (e.g. 201751)
+      2. the team name (e.g. "delphi-epicast")
+    """
+
+    # this is the naming convention for 2017 flu contest submissions
+    pattern = re.compile('^EW(\\d{2})-(.*)-(\\d{4})-(\\d{2})-(\\d{2}).csv$')
+    match = pattern.match(os.path.basename(filename))
+    if match is None:
+      # only able to parse this specific naming convention
+      raise Exception()
+
+    week = int(match.group(1))
+    team = match.group(2)
+    year = int(match.group(3))
+    month = int(match.group(4))
+    day = int(match.group(5))
+    epiweek = EpiDate(year, month, day).get_ew()
+
+    # We know the week number, but the year has to be inferred from the
+    # submission date. Since the week of submission is never less than the week
+    # of the most recent report, we can step backwards from the week of
+    # submission until we find the expected week number. Ordinarily, this will
+    # take exactly two steps. For example, data collected on 2017w51 is
+    # reported on 2017w52, and our forecast is submitted on 2018w01; so we
+    # start with 2018w01 and step backwards until find the first week 51, which
+    # is 2017w51.
+    if not 1 <= week <= 53:
+      # prevent an infinite loop
+      raise Exception('invalid week number: %d' % week)
+    while Epiweek.split_epiweek(epiweek)[1] != week:
+      epiweek = Epiweek.add_epiweeks(epiweek, -1)
+
+    return epiweek, team
+
+  @staticmethod
   def load_csv(filename):
     timestamp = None
-    pattern = re.compile('^EW(\\d{2})-(.*)-(\\d{4})-\\d{2}-\\d{2}.csv$')
-    match = pattern.match(os.path.basename(filename))
-    if match is not None:
-      ew = int(match.group(1))
-      team = match.group(2)
-      year = int(match.group(3))
-      if ew < 40:
-        season = year - 1
-        epiweek = (season + 1) * 100 + ew
-      else:
-        season = year
-        epiweek = season * 100 + ew
-    else:
-      raise NotImplementedError()
+    epiweek, team = ForecastIO.extract_epiweek_and_team(filename)
+
+    season_start = Epiweek.get_season(epiweek)[0]
+    season = Epiweek.split_epiweek(season_start)[0]
 
     forecast = Forecast(season, timestamp, team, epiweek)
 

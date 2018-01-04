@@ -30,7 +30,7 @@ import argparse
 import pylab as plt
 
 # first party
-from .forecast_io import ForecastIO
+from delphi.flu_contest.utils.forecast_io import ForecastIO
 from delphi.epidata.client.delphi_epidata import Epidata
 import delphi.utils.epiweek as flu
 
@@ -180,22 +180,29 @@ class Plotter:
         print('saved %s' % filename)
 
 
-if __name__ == '__main__':
-  both = True
-
-  # args and usage
+def get_argument_parser():
+  """Set up command line arguments and usage."""
   parser = argparse.ArgumentParser()
   parser.add_argument('-o', '--output', action='store', help='save figures with this prefix')
   parser.add_argument('file', action='store', help='the forecast file')
-  if both:
-    parser.add_argument('file2', action='store', help='the forecast file')
-  args = parser.parse_args()
+  parser.add_argument('file2', action='store', help='the forecast file')
+  return parser
+
+
+def main():
+  """Run this script from the command line."""
+
+  # args and usage
+  args = get_argument_parser().parse_args()
 
   # load the forecast
   systems = []
   systems.append((ForecastIO.load_csv(args.file), 'ec', '#e00000'))
-  if both:
-    systems.append((ForecastIO.load_csv(args.file2), 'st', '#0000e0'))
+  systems.append((ForecastIO.load_csv(args.file2), 'st', '#0000e0'))
 
   # plot the forecast
   Plotter.plot(systems, args.output)
+
+
+if __name__ == '__main__':
+  main()

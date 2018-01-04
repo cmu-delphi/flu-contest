@@ -26,7 +26,7 @@ import math
 import struct
 
 # first party
-from .forecast_io import ForecastIO
+from delphi.flu_contest.utils.forecast_io import ForecastIO
 
 
 def double_to_long(x):

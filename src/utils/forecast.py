@@ -1,9 +1,10 @@
 """A collection of forecasts, each for a different location."""
 
 # first party
-from .forecast_location import ForecastLocation
-from .forecast_meta import Locations
-from .forecast_type import ForecastType
+from delphi.flu_contest.utils.forecast_location import ForecastLocation
+from delphi.flu_contest.utils.forecast_meta import Locations
+from delphi.flu_contest.utils.forecast_type import ForecastType
+
 
 class Forecast:
 

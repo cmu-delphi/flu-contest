@@ -64,7 +64,10 @@
       "src": "src/utils/forecast_plots.html",
       "dst": "[[auto_web]]/forecast_plots/index.html",
       "add-header-comment": true
-    }
+    },
+
+    "// run unit and coverage tests",
+    {"type": "py3test"}
 
   ]
 }
