@@ -85,7 +85,9 @@ def main():
     WHERE
       `status` = 0
     ''')
-  for (row_id, name) in cur:
+  # read all the rows here so that the cursor can be reused inside the loop
+  rows = [(row_id, name) for (row_id, name) in cur]
+  for (row_id, name) in rows:
     # get the path to the forecast file
     filename = os.path.join('/common/forecast_uploads', name)
     # attempt to upload
