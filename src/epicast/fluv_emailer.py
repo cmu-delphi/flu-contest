@@ -198,12 +198,12 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'New Data Available (Instructions on adjusting the max wILI value)',
+        'subject': 'New Data Available (Instructions on adjusting the max forecast value)',
         'text': '''
 Dear %s,
 The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by 10:00 AM (ET) this coming %s.
 Thank you so much for your support and cooperation!
-To adjust the maximum wILI value for forecast, click the up/down button on the top left of the forecast page (located at the top of the y-axis). 
+To adjust the maximum forecast value for forecast, click the up/down button on the top left of forecast page (located at the top of y-axis). 
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
 %s
