@@ -198,11 +198,12 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'New Data Available (Instructions on adjusting the max forecast value)',
+        'subject': 'New Data Available (Deadline: Tuesday 10AM, Explanation on Error Bars)',
         'text': '''
 Dear %s,
-The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by 10:00 AM (ET) this coming %s.
+The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by 10:00 AM (ET) this coming Tuesday.
 Thank you so much for your support and cooperation!
+This week we have added error bars to the last four data points for national and regional forecast. Hopefully this can provide an estimate of the range of wILI's backfill in the coming weeks.
 To adjust the maximum forecast value for forecast, click the up/down button on the top left of forecast page (located at the top of y-axis). 
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
@@ -210,15 +211,17 @@ To login and submit your forecasts, visit http://epicast.org and enter your User
 Thank you again for your participation, and good luck on your forecasts!
 Happy Forecasting!
 -The DELPHI Team
-        '''%(u[1], deadline_day, u[0], score_text),
+        '''%(u[1], u[0], score_text),
         'html': '''
 
 
 <p>
   Dear %s,
 </p><p>
-  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming %s.
+  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Tuesday.
   Thank you so much for your support and cooperation!
+</p><p>
+  This week we have added error bars to the last four data points for national and regional forecast. Hopefully this can provide an estimate of the range of wILI's backfill in the coming weeks.
 </p><p>
   To adjust the maximum wILI value for forecast, click the <b>up/down button</b> on the <b>top left</b> of the forecast page (located at the top of the y-axis).
 </p><p>
@@ -233,7 +236,7 @@ Happy Forecasting!
 <br />
   -The DELPHI Team
 </p>
-        '''%(u[1], deadline_day, u[0], u[0], score_html),
+        '''%(u[1], u[0], u[0], score_html),
       },
 
       
@@ -241,12 +244,12 @@ Happy Forecasting!
 # REMINDERS                                                                    #
 ################################################################################
       'reminders': {
-        'subject': 'Forecasts Needed (Deadline: Monday 10AM)',
+        'subject': 'Forecasts Needed (Deadline: Tuesday 10AM)',
         'text': '''
 Dear %s,
 
 
-This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
+This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Tuesday. 
 Thank you so much for your support and cooperation!
 
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
@@ -260,7 +263,7 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
+  This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Tuesday. 
 Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
