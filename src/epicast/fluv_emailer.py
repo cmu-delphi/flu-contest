@@ -198,7 +198,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'New Data Available (Deadline: Tuesday 10AM, explanation on error bars)',
+        'subject': 'New Data Available (Deadline: Tuesday 10AM, explanation for error bars)',
         'text': '''
 Dear %s,
 The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by 10:00 AM (ET) this coming Tuesday.
