@@ -221,7 +221,7 @@ Happy Forecasting!
   The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Tuesday.
   Thank you so much for your support and cooperation!
 </p><p>
-  This week we have added error bars to the last four data points for national and regional forecast. Hopefully this can provide an estimate of the range of wILI's backfill in the coming weeks.
+  This week we have added error bars to the last four data points for national and regional forecasts; hopefully this can provide an estimation of the range of wILI's backfill in the coming weeks.
 </p><p>
   To adjust the maximum wILI value for forecast, click the <b>up/down button</b> on the <b>top left</b> of the forecast page (located at the top of the y-axis).
 </p><p>
