@@ -198,12 +198,12 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'New Data Available (Deadline: Tuesday 10AM, explanation for error bars)',
+        'subject': 'New Data Available (Deadline: Monday 10AM)',
         'text': '''
 Dear %s,
-The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by 10:00 AM (ET) this coming Tuesday.
+The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by 10:00 AM (ET) this coming %s.
 Thank you so much for your support and cooperation!
-This week we have added error bars to the last four data points for national and regional forecasts; hopefully this can provide an estimation of the range of wILI's backfill in the coming weeks.
+On the national and regional forecast pages, you can see black error bars on the last four weeks of wILI data. We include error bars on the flu activity levels of these last few weeks because wILI values are subject to future revisions; hopefully they can provide an estimation of the range of revision in the coming weeks.
 To adjust the maximum forecast value for forecast, click the up/down button on the top left of forecast page (located at the top of y-axis). 
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
@@ -211,17 +211,17 @@ To login and submit your forecasts, visit http://epicast.org and enter your User
 Thank you again for your participation, and good luck on your forecasts!
 Happy Forecasting!
 -The DELPHI Team
-        '''%(u[1], u[0], score_text),
+        '''%(u[1], deadline_day, u[0], score_text),
         'html': '''
 
 
 <p>
   Dear %s,
 </p><p>
-  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Tuesday.
+  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Presidents' Day, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
   Thank you so much for your support and cooperation!
 </p><p>
-  This week we have added error bars to the last four data points for national and regional forecasts; hopefully this can provide an estimation of the range of wILI's backfill in the coming weeks.
+  On the national and regional forecast pages, you can see black error bars on the last four weeks of wILI data. We include error bars on the flu activity levels of these last few weeks because wILI values are subject to future revisions; hopefully they can provide an estimation of the range of revision in the coming weeks.
 </p><p>
   To adjust the maximum wILI value for forecast, click the <b>up/down button</b> on the <b>top left</b> of the forecast page (located at the top of the y-axis).
 </p><p>
