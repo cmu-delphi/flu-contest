@@ -198,7 +198,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': '[Epicast] New Data Available (NEW: 90% Confidence Intervals)',
+        'subject': '[Epicast] New Data Available (NEW: 90%% Confidence Intervals)',
         'text': '''
         
 <b>NEW THIS WEEK</b>: you will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90% confidence intervals for where the final values will end up being.
