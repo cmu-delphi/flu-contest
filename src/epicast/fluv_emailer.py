@@ -198,10 +198,10 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': '[Epicast] New Data Available (NEW: 90%s Confidence Intervals)',
+        'subject': '[Epicast] New Data Available (NEW: 90% Confidence Intervals)',
         'text': '''
         
-<b>NEW THIS WEEK</b>: you will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90% confidence intervals for where the final values will end up being.
+<b>NEW THIS WEEK</b>: you will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
 
 Dear %s,
 The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming %s.
@@ -218,7 +218,7 @@ Happy Forecasting!
 
 
 <p>
-<b>NEW THIS WEEK</b>: you will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90% confidence intervals for where the final values will end up being.
+<b>NEW THIS WEEK</b>: you will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
 </p><p>
   Dear %s,
 </p><p>
@@ -236,7 +236,7 @@ Happy Forecasting!
 <br />
   -The DELPHI Team
 </p>
-        '''%('%', u[1], u[0], u[0], score_html),
+        '''%(u[1], '%', u[0], u[0], score_html),
       },
 
       
