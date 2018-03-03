@@ -236,7 +236,7 @@ Happy Forecasting!
 <br />
   -The DELPHI Team
 </p>
-        '''%(u[1], '%', u[0], u[0], score_html),
+        '''%('%', u[1], u[0], u[0], score_html),
       },
 
       
