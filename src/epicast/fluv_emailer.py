@@ -198,14 +198,14 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'New Data Available (NEW: 90% Confidence Intervals)',
+        'subject': 'New Data Available (Deadline: Monday 10 AM)',
         'text': '''
         
-<b>NEW THIS WEEK</b>: you will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
-
 Dear %s,
 The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming %s.
 Thank you so much for your support and cooperation!
+
+You will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
  
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
@@ -213,17 +213,17 @@ To login and submit your forecasts, visit http://epicast.org and enter your User
 Thank you again for your participation, and good luck on your forecasts!
 Happy Forecasting!
 -The DELPHI Team
-        '''%('%', u[1], deadline_day, u[0], score_text),
+        '''%(u[1], '%', deadline_day, u[0], score_text),
         'html': '''
 
 
 <p>
-<b>NEW THIS WEEK</b>: you will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
-</p><p>
   Dear %s,
 </p><p>
   The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
   Thank you so much for your support and cooperation!
+</p><p>
+  You will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
 </p><p>
   Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations. For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge.
   Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
@@ -236,7 +236,7 @@ Happy Forecasting!
 <br />
   -The DELPHI Team
 </p>
-        '''%('%', u[1], u[0], u[0], score_html),
+        '''%(u[1], '%', u[0], u[0], score_html),
       },
 
       
