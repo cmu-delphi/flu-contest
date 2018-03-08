@@ -198,8 +198,8 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-#         'subject': 'New Data Available (Deadline: Monday 10 AM)',
-        'subject': '[Ignore]Debugging Test',
+        'subject': 'New Data Available (Deadline: Monday 10 AM)',
+#         'subject': '[Ignore]Debugging Test',
         'text': '''
         
 Dear %s,
