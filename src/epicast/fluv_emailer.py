@@ -214,7 +214,7 @@ To login and submit your forecasts, visit http://epicast.org and enter your User
 Thank you again for your participation, and good luck on your forecasts!
 Happy Forecasting!
 -The DELPHI Team
-        '''%(u[1], '%', deadline_day, u[0], score_text),
+        '''%(u[1], deadline_day, '%', u[0], score_text),
         'html': '''
 
 
