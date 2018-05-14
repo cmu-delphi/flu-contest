@@ -259,7 +259,7 @@ Thank you, and have a great year.
   In each of the past 27 weeks, we have generated flu forecast for 11 Health and Human Service regions, 5 states (Pennsylvania, Georgia, Washington DC, Texas and Oregon), and 6 hospitalization age groups. We have achieved top ranks among the participating teams, as well as provided helpful input to health policy makers. We would not have been able to achieve any of these without your help.
 </p><p>
   Accurate forecasting of flu’s spread in different regions is important for many aspects of the society, and Epicast will continue to utilize “Wisdom of the Crowds” to provide useful inputs. We will be participating in the <a href="https://predict.phiresearchlab.org/">“Predict the Flu” challenge</a> again next year. You can expect to hear from us this coming fall, when we will be inviting you to participate again in this important exercise, and to spread the word to others!
-</p>%s<p>
+</p><p>
   Thank you, and have a great year.
 </p>
 <br />
