@@ -3,6 +3,9 @@ utilities for hospitalization data analysis.
 """
 # first party
 import utils.epiweek as utils
+# third party
+import bootstrapped.bootstrap as bs
+import bootstrapped.stats_functions as stat_f
 
 def get_window(epiweek, left_window, right_window):
     """
@@ -30,12 +33,20 @@ def fill(data):
     Returns:
         the modified data source
     """
-    for _, series in data.iteritems():
+    for _, series in data.items():
         # for all series, repeat the last value until length = 52
         final_val = series[-1]
-        series.extend([final_val]*(52-len(series)))
+        series.extend([final_val] * (52 - len(series)))
     
     return data
+
+def get_season(time_period):
+    """ return the epiweek range of the flu season containing the epiweek """
+    start, end = time_period.split('-')
+    start_year = (int(start) - 40) // 100
+    end_year = (int(end) - 40) // 100
+
+    return start_year, end_year
 
 def unravel(time_period):
     """
@@ -57,3 +68,7 @@ def ravel(start, end):
     given start and end of a time period, return the string representation of that period. 
     """
     return str(start)+'-'+str(end)
+
+def bootstrap_mean(residuals, alpha):
+    interval = bs.bootstrap(residuals, stat_f.mean, alpha=alpha)
+    return interval.lower_bound, interval.upper_bound

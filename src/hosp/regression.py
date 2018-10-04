@@ -1,12 +1,11 @@
 """
-The module applies linear regression for final-value prediction. Compatible with both Python 2 and 3.
+The module applies linear regression for final-value prediction. Compatible with Python 3.4+.
 
 Functionalities include:
     1. Cross-validation
-    2. Report Generation for Cross-validation
+    2. Report Generation
     3. Prediction
 """
-from __future__ import division, print_function
 # first party
 import flu_contest.src.hosp.preparation as preparation
 import flu_contest.src.hosp.hosp_utils as hosp_utils 
@@ -14,12 +13,17 @@ import utils.epiweek as utils
 # third party
 import os
 import pickle
+from tqdm import tqdm
+
 import numpy as np
-import matplotlib.pyplot as plt
+
 import sklearn.metrics as metrics
+from sklearn.linear_model import LinearRegression 
 from sklearn.svm import SVR
 
-def regression(X, Y, X_val):
+import matplotlib.pyplot as plt
+
+def train_model(X, Y, model_type='linear'):
     """
     build SVR regression model for final-value prediction.
 
@@ -32,14 +36,19 @@ def regression(X, Y, X_val):
         Y_pred - predicted targets for testing data
     """
     # build SVR model
-    model = SVR(kernel='linear', epsilon=5e-3, C=2.0)
+    if model_type == 'linear':
+        model = LinearRegression()
+    elif model_type == 'svr':
+        model = SVR(kernel='linear', epsilon=5e-3, C=2.0)
     # fit the training data and predict for testing data
     model.fit(X, Y)
-    Y_pred = model.predict(X_val.T)
+    res = Y / model.predict(X) - 1
 
-    return Y_pred
+    return model, res
 
-def validate(data, time_period, lag, left_window, right_window, backfill_window, group):
+def validate(data, time_period, lag, 
+            left_window, right_window, backfill_window, 
+            groups, model_type):
     """
     apply cross-validation for a time period with a certain lag.
 
@@ -60,75 +69,113 @@ def validate(data, time_period, lag, left_window, right_window, backfill_window,
     """
     # convert time period (string) to epiweek generator
     period = hosp_utils.unravel(time_period)
+    start = groups[0]
     # initialize
-    predictions = []
-    ground_truth = []
-    cur_truth = []
+    predictions = [[]] * len(groups)
+    predictions_lower = [[]] * len(groups)
+    predictions_upper = [[]] * len(groups)
+    ground_truth = [[]] * len(groups)
+    cur_truth = [[]] * len(groups)
     valid_weeks = []
 
     for epiweek in period:
+        # add current week
+        valid_weeks.append(epiweek)
         # for each epiweek with current lag, 
-        # get data from the latest available one-year period to train SVR regression
+        # get data from the latest available one-year period to train regression
         year, week = utils.split_epiweek(epiweek)
-        start = utils.add_epiweeks(utils.join_epiweek(year-2, week), lag)
-        end = utils.add_epiweeks(utils.join_epiweek(year-1, week), lag)
+        start = utils.add_epiweeks(utils.join_epiweek(year - 2, week), lag)
+        end = utils.add_epiweeks(utils.join_epiweek(year - 1, week), lag)
         model_period = hosp_utils.ravel(start, end)
 
-        if (epiweek, group) in data:
-            # obtain training and testing data
-            X, Y = preparation.prepare(data, model_period, lag, left_window, right_window, 
-                                        backfill_window, group)
-            x_val, cur_y_val, y_val = preparation.fetch(data, epiweek, lag, left_window, right_window, 
-                                        backfill_window, group)
-            # get prediction
-            pred = regression(X, Y, x_val)
-            valid_weeks.append(epiweek)
-            predictions.append(pred)
-            cur_truth.append(cur_y_val)
-            ground_truth.append(y_val)
-    # collapse predictions from 3d to 2d array
-    predictions = np.concatenate(predictions, axis=0).squeeze()
-    return valid_weeks, predictions, cur_truth, ground_truth
+        X, Y = preparation.prepare(data, [model_period], lag, 
+                                    left_window, right_window, backfill_window, 
+                                    groups)
+        model, res = train_model(X, Y, model_type)   
 
-def backcast_report(path, data, time_period, lag, backfill_window, group):
-    """
-    generate reports for backcasting.
+        for group in groups:
+            idx = group - start
+            
+            if (epiweek, group) in data:
+                # obtain training and testing data
+                x_val, cur_y_val, y_val = preparation.fetch(data, epiweek, lag, 
+                                            left_window, right_window, backfill_window, 
+                                            group)
+                # get prediction
+                res_mean_l, res_mean_u = hosp_utils.bootstrap_mean(res, alpha=0.05)
+                pred = model.predict(x_val.T)
+                pred_l, pred_u = pred * (1 + res_mean_l), pred * (1 + res_mean_u)
+                # record the results
+                
+                cur_truth[idx].append(cur_y_val)
+                ground_truth[idx].append(y_val)
 
-    Args:
-        path - the directory path for report.
-        data - the data source (included all epiweeks with all lags)
-        time_period - a string representing the starting and ending epiweek
-        lag - the current time lag.
-        backfill_window - the backfill period: [cur_time-window, cur_time]
-        group - the current age group. (as a index from 0 to 4)
+                predictions[idx].append(pred)
+                predictions_lower[idx].append(pred_l)
+                predictions_upper[idx].append(pred_u)
+
+            # collapse predictions from 3d to 2d array
+            predictions[idx] = np.concatenate(predictions[idx], axis=0).squeeze()
+            predictions_lower[idx] = np.concatenate(predictions_lower[idx], axis=0).squeeze()
+            predictions_upper[idx] = np.concatenate(predictions_upper[idx], axis=0).squeeze()
+            
+    return valid_weeks, predictions, predictions_lower, predictions_upper, cur_truth, ground_truth, res
+
+def validate_all(data, time_period, lag, 
+                left_window, right_window, backfill_window, 
+                groups, model_type):
+    start_year, end_year = hosp_utils.get_season(time_period)
+    period = hosp_utils.unravel(time_period)
+    model_periods = []
+
+    for year in range(2012, 2018):
+        if year not in range(start_year, end_year + 1):
+            start_week = year * 100 + 44
+            end_week = (year + 1) * 100 + 17
+            model_periods.append(hosp_utils.ravel(start_week, end_week))
+
+    X, Y = preparation.prepare(data, model_periods, lag, 
+                                left_window, right_window, backfill_window, 
+                                groups)
+    model, res = train_model(X, Y, model_type)
+    res_mean_l, res_mean_u = hosp_utils.bootstrap_mean(res, alpha=0.05)
+
+    predictions = [[]] * len(groups)
+    predictions_lower = [[]] * len(groups)
+    predictions_upper = [[]] * len(groups)
+    ground_truth = [[]] * len(groups)
+    cur_truth = [[]] * len(groups)
+    valid_weeks = []
+    start = groups[0]
+
+    for epiweek in period:
+        valid_weeks.append(epiweek)
+        # iterate over groups
+        for group in groups:
+            idx = group - start
+
+            if (epiweek, group) in data:
+                x_val, cur_y_val, y_val = preparation.fetch(data, epiweek, lag, 
+                                                            left_window, right_window, backfill_window, 
+                                                            group)
+                pred = model.predict(x_val.T)
+                # record the results
+                predictions[idx].append(pred)
+                cur_truth[idx].append(cur_y_val)
+                ground_truth[idx].append(y_val)
+        
+    for group in groups:
+        idx = group - start
+        # collapse predictions from 3d to 2d array
+        predictions[idx] = np.concatenate(predictions[idx], axis=0).squeeze()
+        predictions_lower[idx] = predictions[idx] * (1 + res_mean_l)
+        predictions_upper[idx] = predictions[idx] * (1 + res_mean_u)
     
-    Returns:
-        rsq - the explained variance statistics of prediction
-        mse - the mean squared error between ground truth and prediction.
-    """
-    # run cross validation and calculate statistics
-    valid_weeks, predictions, cur_truth, ground_truth = validate(data, time_period, lag=lag, 
-                                        left_window=0, right_window=0,
-                                        backfill_window=backfill_window, group=group)
-    rsq = metrics.explained_variance_score(ground_truth, predictions)
-    mse = metrics.mean_squared_error(ground_truth, predictions)
-    # plot with epiweeks as ticks for x-axis
-    inds = range(len(valid_weeks))
-    week_ticks = [str(epiweek%100) for epiweek in valid_weeks]
-    # plot and save the figures
-    plt.figure()
-    plt.plot(inds, predictions, label='predicted rate')
-    plt.plot(inds, cur_truth, label='current rate')
-    plt.plot(inds, ground_truth, label='true rate')
-    plt.xticks(inds, week_ticks, rotation='vertical')
-    plt.xlabel('weeks')
-    plt.ylabel('hospitalized rate')
-    plt.legend()
-    plt.savefig(path+'/'+str(group)+'-'+str(lag)+'-'+str(backfill_window)+'.png')
+    return valid_weeks, predictions, predictions_lower, predictions_upper, cur_truth, ground_truth, res
 
-    return rsq, mse
-
-def nowcast_report(path, data, time_period, left_window, backfill_window, group):
+def nowcast_report(path, data, time_period, 
+                    left_window, backfill_window, 
+                    groups, mode, model_type):
     """
     generate a report for linear regression.
 
@@ -144,62 +191,76 @@ def nowcast_report(path, data, time_period, left_window, backfill_window, group)
         rsq - the explained variance statistics of prediction
         mse - the mean squared error of prediction
     """
+    start = groups[0]
+    rsq = [None] * len(groups)
+    mse = [None] * len(groups)
     # run cross validation and calculate statistics
-    valid_weeks, predictions, cur_truth, ground_truth = validate(data, time_period, lag=1, 
-                                        left_window=left_window, right_window=0,
-                                        backfill_window=backfill_window, group=group)
-    rsq = metrics.explained_variance_score(ground_truth, predictions)
-    mse = metrics.mean_squared_error(ground_truth, predictions)
-    # plot with epiweeks as ticks for x-axis
-    inds = range(len(valid_weeks))
-    week_ticks = [str(epiweek%100) for epiweek in valid_weeks]
-    # plot and save the figures
-    plt.figure()
-    plt.plot(inds, predictions, label='predicted rate')
-    plt.plot(inds, cur_truth, label='current rate')
-    plt.plot(inds, ground_truth, label='true rate')
-    plt.xticks(inds, week_ticks, rotation='vertical')
-    plt.xlabel('weeks')
-    plt.ylabel('hospitalized rate')
-    plt.legend()
-    plt.savefig(path+'/'+str(group)+'-'+str(left_window)+'-'+str(backfill_window)+'.png')
+    if mode == 'prev':
+        valid_weeks, predictions, predictions_lower, predictions_upper, cur_truth, ground_truth, _ = \
+        validate(data, time_period, lag=0, 
+                left_window=left_window, right_window=0, backfill_window=backfill_window, 
+                groups=groups, model_type=model_type)
+    elif mode == 'all':
+        valid_weeks, predictions, predictions_lower, predictions_upper, cur_truth, ground_truth, res = \
+        validate_all(data, time_period, lag=0, 
+                    left_window=left_window, right_window=0, backfill_window=backfill_window, 
+                    groups=groups, model_type=model_type)
 
+    for group in groups: 
+        idx = group - start 
+
+        rsq[idx] = metrics.explained_variance_score(ground_truth[idx], predictions[idx])
+        mse[idx] = metrics.mean_squared_error(ground_truth[idx], predictions[idx])
+        # plot with epiweeks as ticks for x-axis
+        inds = range(len(valid_weeks))
+        week_ticks = [str(epiweek % 100) for epiweek in valid_weeks]
+        # plot predicted rate, true rate, and current rate
+        plt.figure()
+        plt.plot(inds, predictions[idx], label='predicted rate')
+        plt.plot(inds, predictions_upper[idx], label='predicted rate upper bound')
+        plt.plot(inds, predictions_lower[idx], label='predicted rate lower bound')
+        plt.plot(inds, cur_truth[idx], label='current rate')
+        plt.plot(inds, ground_truth[idx], label='true rate')
+        plt.xticks(inds, week_ticks, rotation='vertical')
+        plt.xlabel('weeks')
+        plt.ylabel('hospitalized rate')
+        plt.legend()
+        plt.savefig(path + '/' + str(group) + '-' +
+                    str(left_window) + '-' + str(backfill_window) + '.png', dpi=300)
+        plt.close()
+        # plot histogram for training residuals
+        plt.figure()
+        plt.hist(res, bins=50, facecolor='g')
+        plt.xlabel('residuals')
+        plt.ylabel('frequencies')
+        plt.savefig(path + '/' + 'hist_' + str(group) + '-' +
+                    str(left_window) + '-' + str(backfill_window) + '.png', dpi=300)
+        plt.close()
+        
     return rsq, mse
 
-def run_backcast_experiment(data, time_periods, max_lag):
-    """
-    run backcasting experiments for different time periods.
+def plot_results(path, results, name, group, colormap):
+    descriptions = ['Ages 0-4', 'Ages 5-17', 'Ages 18-49', 
+                    'Ages 50-64', 'Ages 65+']
+    length, width = results.shape
+    fig, ax = plt.subplots()
+    ax.imshow(results, cmap=colormap)
 
-    Args:
-        data - the data source (included all epiweeks with all lags)
-        time_periods - a list of time period (strings representing the starting and ending epiweek)
-        max_lag - the maximum time lag considered in experiment
+    ax.set_title(descriptions[group])
+    ax.set_ylabel('window')
+    ax.set_xlabel('backfill')
+    ax.set_yticks(range(length))
+    ax.set_xticks(range(width))
+
+    for i in range(length):
+        for j in range(i+1):
+            ax.text(j, i, '{:.2f}'.format(results[i][j]), ha='center', va='center', color='w')
     
-    Returns:
-        None
-    """
-    for period in time_periods:
-        # create the path for writing reports
-        report_path = './backcast/'+str(period)
-        if not os.path.exists(report_path):
-            os.mkdir(report_path)
-        # create table and write headers
-        f = open(report_path+'/results.csv', mode='w')
-        f.write('group,lag,backfill_window,rsq,mse'+'\n') 
+    fig.tight_layout()
+    plt.savefig(path + '/' + name + '_results_' + str(group) + '.png', dpi=300)
+    plt.close(fig)
 
-        # report for each combination of backfill window and lags
-        for group in range(5):
-            for l in range(1, max_lag+1):
-                for window in range(1, l+1):
-                    rsq, mse = backcast_report(report_path, data, period, 
-                                                lag=l, backfill_window=window, group=group)
-                    # write to table
-                    f.write(str(group)+','+str(l)+','+str(window)+','+\
-                            '{:.3f}'.format(rsq)+','+'{:.3f}'.format(mse)+'\n')
-        # close table
-        f.close()
-
-def run_nowcast_experiment(data, time_periods, max_window, max_backfill):
+def run_nowcast_experiment(data, time_periods, groupings, max_window, mode, model_type):
     """
     run nowcasting experiments for different time periods.
 
@@ -212,27 +273,34 @@ def run_nowcast_experiment(data, time_periods, max_window, max_backfill):
     Returns:
         None
     """
+
     for period in time_periods:
         # create the path for writing reports
         report_path = './nowcast/'+str(period)
         if not os.path.exists(report_path):
             os.mkdir(report_path)
-        # create table
-        f = open(report_path+'/results.csv', mode='w')
-        f.write('group,left_window,backfill_window,rsq,mse'+'\n') 
-        # report for each combination of backfill window and lags
-        for group in range(5):
-            for window in range(0, max_window+1):
-                for backfill in range(1, window+2):
-                    rsq, mse = nowcast_report(report_path, data, period, 
-                                left_window=window, backfill_window=backfill, group=group)
-                    # write to table
-                    f.write(str(group)+','+str(window)+','+str(backfill)+','+\
-                            '{:.3f}'.format(rsq)+','+'{:.3f}'.format(mse)+'\n')
-        # close table
-        f.close()
 
-def predict(data, epiweek, prediction_window, max_window, max_backfill):
+        for groups in tqdm(groupings):
+            start = groups[0]
+            mse_results = [np.full((max_window + 1, max_window + 1), -np.inf) for _ in range(len(groups))]
+            rsq_results = [np.full((max_window + 1, max_window + 1), -np.inf) for _ in range(len(groups))]
+
+            for window in tqdm(range(max_window + 1)):
+                for backfill in range(window + 1):
+                    rsq, mse = nowcast_report(report_path, data, period,
+                                                left_window=window, backfill_window=backfill, 
+                                                groups=groups, mode=mode, model_type=model_type)
+                    for group in groups:
+                        idx = group - start
+                        mse_results[idx][window][backfill] = mse[idx]
+                        rsq_results[idx][window][backfill] = rsq[idx]
+            
+            for group in groups:
+                idx = group - start
+                plot_results(report_path, mse_results[idx], 'mse', group, 'Reds')
+                plot_results(report_path, rsq_results[idx], 'rsq', group, 'Blues')
+
+def predict(data, epiweek, prediction_window, max_window, max_backfill, model_type):
     """
     perform prediction for specific epiweek.
 
@@ -254,11 +322,11 @@ def predict(data, epiweek, prediction_window, max_window, max_backfill):
         cur_rsq = 0
 
         # perform cross-validation and select the optimal hyperparameters
-        for window in range(0, max_window+1):
-            for backfill in range(1, window+2):
-                _, predictions, ground_truth, _ = validate(data, validate_period, lag=1, 
+        for window in range(0, max_window + 1):
+            for backfill in range(1, window + 2):
+                _, predictions, ground_truth, _ = validate(data, validate_period, lag=0, 
                                     left_window=window, right_window=0, backfill_window=backfill,
-                                    group=group)
+                                    group=group, model_type=model_type)
                 rsq = metrics.explained_variance_score(ground_truth, predictions)
 
                 if rsq > cur_rsq:
@@ -268,11 +336,12 @@ def predict(data, epiweek, prediction_window, max_window, max_backfill):
         
         # use validation period (i.e. the latest) to train the model
         # and then make predictions
-        X, Y = preparation.prepare(data, validate_period, lag=1, left_window=optimal_window, right_window=0, 
-                            backfill_window=optimal_backfill, group=group)
-        X_pred, _, _ = preparation.fetch(data, epiweek, lag=1, left_window=optimal_window, right_window=0, 
-                            backfill_window=optimal_backfill, group=group) 
-        pred = regression(X, Y, X_pred)
+        X, Y = preparation.prepare(data, validate_period, lag=0, left_window=optimal_window, right_window=0, 
+                                    backfill_window=optimal_backfill, group=group)
+        X_pred, _, _ = preparation.fetch(data, epiweek, lag=0, left_window=optimal_window, right_window=0, 
+                                            backfill_window=optimal_backfill, group=group) 
+        model = train_model(X, Y, model_type)
+        pred = model.predict(X_pred)
         preds.append(pred)
     
     preds = np.concatenate(preds, axis=0).squeeze()
