@@ -69,7 +69,6 @@ def validate(data, time_period, lag,
     """
     # convert time period (string) to epiweek generator
     period = hosp_utils.unravel(time_period)
-    start = groups[0]
     # initialize
     predictions = [[]] * len(groups)
     predictions_lower = [[]] * len(groups)
@@ -93,8 +92,8 @@ def validate(data, time_period, lag,
                                     groups)
         model, res = train_model(X, Y, model_type)   
 
-        for group in groups:
-            idx = group - start
+        for idx in range(len(groups)):
+            group = groups[idx]
             
             if (epiweek, group) in data:
                 # obtain training and testing data
@@ -106,7 +105,6 @@ def validate(data, time_period, lag,
                 pred = model.predict(x_val.T)
                 pred_l, pred_u = pred * (1 + res_mean_l), pred * (1 + res_mean_u)
                 # record the results
-                
                 cur_truth[idx].append(cur_y_val)
                 ground_truth[idx].append(y_val)
 
@@ -119,7 +117,10 @@ def validate(data, time_period, lag,
             predictions_lower[idx] = np.concatenate(predictions_lower[idx], axis=0).squeeze()
             predictions_upper[idx] = np.concatenate(predictions_upper[idx], axis=0).squeeze()
             
-    return valid_weeks, predictions, predictions_lower, predictions_upper, cur_truth, ground_truth, res
+    return valid_weeks, \
+        predictions, predictions_lower, predictions_upper, \
+        cur_truth, ground_truth, \
+        res
 
 def validate_all(data, time_period, lag, 
                 left_window, right_window, backfill_window, 
@@ -146,13 +147,12 @@ def validate_all(data, time_period, lag,
     ground_truth = [[]] * len(groups)
     cur_truth = [[]] * len(groups)
     valid_weeks = []
-    start = groups[0]
 
     for epiweek in period:
         valid_weeks.append(epiweek)
         # iterate over groups
-        for group in groups:
-            idx = group - start
+        for idx in range(len(groups)):
+            group = groups[idx]
 
             if (epiweek, group) in data:
                 x_val, cur_y_val, y_val = preparation.fetch(data, epiweek, lag, 
@@ -163,10 +163,8 @@ def validate_all(data, time_period, lag,
                 predictions[idx].append(pred)
                 cur_truth[idx].append(cur_y_val)
                 ground_truth[idx].append(y_val)
-        
-    for group in groups:
-        idx = group - start
-        # collapse predictions from 3d to 2d array
+    # collapse predictions from 3d to 2d array   
+    for idx in range(len(groups)):
         predictions[idx] = np.concatenate(predictions[idx], axis=0).squeeze()
         predictions_lower[idx] = predictions[idx] * (1 + res_mean_l)
         predictions_upper[idx] = predictions[idx] * (1 + res_mean_u)
@@ -191,7 +189,6 @@ def nowcast_report(path, data, time_period,
         rsq - the explained variance statistics of prediction
         mse - the mean squared error of prediction
     """
-    start = groups[0]
     rsq = [None] * len(groups)
     mse = [None] * len(groups)
     # run cross validation and calculate statistics
@@ -206,8 +203,8 @@ def nowcast_report(path, data, time_period,
                     left_window=left_window, right_window=0, backfill_window=backfill_window, 
                     groups=groups, model_type=model_type)
 
-    for group in groups: 
-        idx = group - start 
+    for idx in range(len(groups)): 
+        group = groups[idx]
 
         rsq[idx] = metrics.explained_variance_score(ground_truth[idx], predictions[idx])
         mse[idx] = metrics.mean_squared_error(ground_truth[idx], predictions[idx])
@@ -281,26 +278,26 @@ def run_nowcast_experiment(data, time_periods, groupings, max_window, mode, mode
             os.mkdir(report_path)
 
         for groups in tqdm(groupings):
-            start = groups[0]
-            mse_results = [np.full((max_window + 1, max_window + 1), -np.inf) for _ in range(len(groups))]
-            rsq_results = [np.full((max_window + 1, max_window + 1), -np.inf) for _ in range(len(groups))]
+            mse_results = [np.full((max_window + 1, max_window + 1), -np.inf) 
+                            for _ in range(len(groups))]
+            rsq_results = [np.full((max_window + 1, max_window + 1), -np.inf) 
+                            for _ in range(len(groups))]
 
             for window in tqdm(range(max_window + 1)):
                 for backfill in range(window + 1):
                     rsq, mse = nowcast_report(report_path, data, period,
                                                 left_window=window, backfill_window=backfill, 
                                                 groups=groups, mode=mode, model_type=model_type)
-                    for group in groups:
-                        idx = group - start
+                    for idx in range(len(groups)):
                         mse_results[idx][window][backfill] = mse[idx]
                         rsq_results[idx][window][backfill] = rsq[idx]
             
-            for group in groups:
-                idx = group - start
+            for idx in range(len(groups)):
+                group = groups[idx]
                 plot_results(report_path, mse_results[idx], 'mse', group, 'Reds')
                 plot_results(report_path, rsq_results[idx], 'rsq', group, 'Blues')
 
-def predict(data, epiweek, prediction_window, max_window, max_backfill, model_type):
+def predict(data, epiweek, groupings, prediction_window, max_window, max_backfill, model_type):
     """
     perform prediction for specific epiweek.
 
@@ -315,18 +312,21 @@ def predict(data, epiweek, prediction_window, max_window, max_backfill, model_ty
     val_end = utils.join_epiweek(year-1, week)
     val_start = utils.add_epiweeks(val_end, -prediction_window)
     validate_period = hosp_utils.ravel(val_start, val_end)
-    preds = []
 
-    for group in range(5):
+    for groups in groupings:
+        preds = [[]] * len(groups)
+        preds_upper = [[]] * len(groups)
+        preds_lower = [[]] * len(groups)
+
         optimal_window = optimal_backfill = 0
         cur_rsq = 0
 
         # perform cross-validation and select the optimal hyperparameters
         for window in range(0, max_window + 1):
             for backfill in range(1, window + 2):
-                _, predictions, ground_truth, _ = validate(data, validate_period, lag=0, 
+                _, predictions, _, _, _, ground_truth, _ = validate(data, validate_period, lag=0, 
                                     left_window=window, right_window=0, backfill_window=backfill,
-                                    group=group, model_type=model_type)
+                                    groups=groups, model_type=model_type)
                 rsq = metrics.explained_variance_score(ground_truth, predictions)
 
                 if rsq > cur_rsq:
@@ -337,12 +337,26 @@ def predict(data, epiweek, prediction_window, max_window, max_backfill, model_ty
         # use validation period (i.e. the latest) to train the model
         # and then make predictions
         X, Y = preparation.prepare(data, validate_period, lag=0, left_window=optimal_window, right_window=0, 
-                                    backfill_window=optimal_backfill, group=group)
-        X_pred, _, _ = preparation.fetch(data, epiweek, lag=0, left_window=optimal_window, right_window=0, 
-                                            backfill_window=optimal_backfill, group=group) 
-        model = train_model(X, Y, model_type)
-        pred = model.predict(X_pred)
-        preds.append(pred)
-    
-    preds = np.concatenate(preds, axis=0).squeeze()
+                                    backfill_window=optimal_backfill, groups=groups)
+        model, res = train_model(X, Y, model_type)
+        res_mean_l, res_mean_u = hosp_utils.bootstrap_mean(res, alpha=0.05)
+
+        for idx in range(len(groups)):
+            group = groups[idx]
+            X_pred, _, _ = preparation.fetch(data, epiweek, lag=0, 
+                                            left_window=optimal_window, right_window=0, backfill_window=optimal_backfill, 
+                                            group=group) 
+            pred = model.predict(X_pred)
+            pred_u = pred + res_mean_u
+            pred_l = pred + res_mean_l
+            
+            preds[idx].append(pred)
+            preds_upper[idx].append(pred_u)
+            preds_lower[idx].append(pred_l)
+
+        for idx in range(len(groups)):
+            preds[idx] = np.concatenate(preds[idx], axis=0).squeeze()
+            preds_upper[idx] = np.concatenate(preds_upper[idx], axis=0).squeeze()
+            preds_lower[idx] = np.concatenate(preds_lower[idx], axis=0).squeeze()
+
     return preds
