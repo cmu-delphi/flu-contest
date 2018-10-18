@@ -7,8 +7,9 @@ Functionalities include:
     3. Prediction
 """
 # first party
-import flu_contest.src.hosp.location.preparation_loc as preparation_loc
-import flu_contest.src.hosp.hosp_utils as hosp_utils 
+import flu_contest.src.hosp.preparation as preparation
+import flu_contest.src.hosp.hosp_utils as hosp_utils
+import flu_contest.src.hosp.ml_utils as ml_utils
 import utils.epiweek as utils
 # third party
 import os
@@ -38,19 +39,20 @@ def train_model(X, Y, model_type):
     """
     # build model
     if model_type == 'linear':
-        model = LinearRegression()
+        model_upper = ml_utils.QuantLinear(0.95)
+        model = ml_utils.QuantLinear(0.5)
+        model_lower = ml_utils.QuantLinear(0.05)
     elif model_type == 'ridge':
-        model = Ridge()
-    elif model_type == 'svr':
-        model = SVR(kernel='linear', epsilon=5e-3, C=2.0)
-    elif model_type == 'gb':
-        model = GradientBoostingRegressor(loss='quantile', )
+        model_upper = ml_utils.QuantRidge(0.95, 1.0)
+        model = ml_utils.QuantRidge(0.5, 1.0)
+        model_lower = ml_utils.QuantRidge(0.05, 1.0)
     # fit the training data and 
     # calculate residuals for confidence interval estimation
+    model_upper.fit(X, Y)
     model.fit(X, Y)
-    res = Y - model.predict(X)
+    model_lower.fit(X, Y)
 
-    return model, res
+    return model_upper, model, model_lower
 
 def validate(data, 
             locations, groups, 
@@ -94,17 +96,15 @@ def validate(data,
         valid_weeks.append(epiweek)
         # for each epiweek with current lag, 
         # get data from the latest available one-year period to train regression
-        year, week = utils.split_epiweek(epiweek)
-        start = utils.add_epiweeks(utils.join_epiweek(year - 2, week), lag)
-        end = utils.add_epiweeks(utils.join_epiweek(year - 1, week), lag)
+        start = utils.add_epiweeks(epiweek, lag - 52 * 2)
+        end = utils.add_epiweeks(epiweek, lag - 52)
         model_period = hosp_utils.ravel(start, end)
 
-        X, Y = preparation_loc.prepare(data, locations, [model_period], lag, 
-                                        left_window, right_window, backfill_window, 
-                                        groups)
+        X, Y = preparation.prepare(data, locations, groups, 
+                                    [model_period], lag, 
+                                    left_window, right_window, backfill_window)
         # train the model and get confidence interval
-        model, res = train_model(X, Y, model_type)  
-        res_mean_l, res_mean_u = hosp_utils.bootstrap_mean(res, alpha=0.05) 
+        model_upper, model, model_lower = train_model(X, Y, model_type)
 
         for l_idx in range(len(locations)):
             location = locations[l_idx]
@@ -114,13 +114,14 @@ def validate(data,
                 
                 if (epiweek, group, location) in data:
                     # obtain training and testing data for each location and group
-                    x_val, cur_y_val, y_val = preparation_loc.fetch(data, location, group, 
+                    x_val, cur_y_val, y_val = preparation.fetch(data, location, group, 
                                                                     epiweek, lag, 
                                                                     left_window, right_window, 
                                                                     backfill_window)
                     # get prediction with confidence interval
                     pred = model.predict(x_val.T)
-                    pred_l, pred_u = pred + res_mean_l, pred + res_mean_u
+                    pred_u = model_upper.predict(x_val.T)
+                    pred_l = model_lower.predict(x_val.T)
                     # record the results
                     cur_truth[l_idx][idx].append(cur_y_val)
                     ground_truth[l_idx][idx].append(y_val)
@@ -129,18 +130,19 @@ def validate(data,
                     predictions_lower[l_idx][idx].append(pred_l)
                     predictions_upper[l_idx][idx].append(pred_u)
 
-            # collapse predictions from 3d to 2d array
+    for l_idx in range(len(locations)):
+        for idx in range(len(groups)):
+        # collapse predictions from 3d to 2d array
             predictions[l_idx][idx] = np.concatenate(
-                                                predictions[l_idx][idx], axis=0).squeeze()
+                                            predictions[l_idx][idx], axis=0).squeeze()
             predictions_lower[l_idx][idx] = np.concatenate(
-                                                predictions_lower[l_idx][idx], axis=0).squeeze()
+                                            predictions_lower[l_idx][idx], axis=0).squeeze()
             predictions_upper[l_idx][idx] = np.concatenate(
-                                                predictions_upper[l_idx][idx], axis=0).squeeze()
+                                            predictions_upper[l_idx][idx], axis=0).squeeze()
             
     return valid_weeks, \
         predictions, predictions_lower, predictions_upper, \
-        cur_truth, ground_truth, \
-        res
+        cur_truth, ground_truth
 
 def validate_all(data, 
                 locations, groups, 
@@ -180,11 +182,11 @@ def validate_all(data,
             end_week = (year + 1) * 100 + 17
             model_periods.append(hosp_utils.ravel(start_week, end_week))
     # train model and calculate confidence interval
-    X, Y = preparation_loc.prepare(data, locations, groups, 
+    X, Y = preparation.prepare(data, locations, groups, 
                                     model_periods, lag, 
                                     left_window, right_window, backfill_window)
-    model, res = train_model(X, Y, model_type)
-    res_mean_l, res_mean_u = hosp_utils.bootstrap_mean(res, alpha=0.05)
+    model_upper, model, model_lower = train_model(X, Y, model_type)
+
     # initialize
     predictions = hosp_utils.create_double_list([], len(locations), len(groups))
     predictions_lower = hosp_utils.create_double_list([], len(locations), len(groups))
@@ -203,25 +205,27 @@ def validate_all(data,
                 group = groups[idx]
 
                 if (epiweek, group, location) in data:
-                    x_val, cur_y_val, y_val = preparation_loc.fetch(data, location, group, 
+                    x_val, cur_y_val, y_val = preparation.fetch(data, location, group, 
                                                                 epiweek, lag, 
                                                                 left_window, right_window, 
                                                                 backfill_window)
                     pred = model.predict(x_val.T)
+                    pred_u = model_upper.predict(x_val.T)
+                    pred_l = model_lower.predict(x_val.T)
                     # record the results
                     predictions[l_idx][idx].append(pred)
+                    predictions_lower[l_idx][idx].append(pred_l)
+                    predictions_upper[l_idx][idx].append(pred_u)
+                    # record ground truth
                     cur_truth[l_idx][idx].append(cur_y_val)
                     ground_truth[l_idx][idx].append(y_val)
         # collapse predictions from 3d to 2d array   
         for idx in range(len(groups)):
             predictions[l_idx][idx] = np.concatenate(predictions[l_idx][idx], axis=0).squeeze()
-            predictions_lower[l_idx][idx] = predictions[l_idx][idx] + res_mean_l
-            predictions_upper[l_idx][idx] = predictions[l_idx][idx] + res_mean_u
     
     return valid_weeks, \
         predictions, predictions_lower, predictions_upper, \
-        cur_truth, ground_truth, \
-        res
+        cur_truth, ground_truth
 
 def nowcast_report(path, data, 
                     locations, groups, 
@@ -255,8 +259,7 @@ def nowcast_report(path, data,
     if mode == 'prev':
         valid_weeks, \
         predictions, predictions_lower, predictions_upper, \
-        cur_truth, ground_truth, \
-        _ = \
+        cur_truth, ground_truth = \
         validate(data, 
                 locations, groups,
                 time_period, lag=0, 
@@ -266,8 +269,7 @@ def nowcast_report(path, data,
     elif mode == 'all':
         valid_weeks, \
         predictions, predictions_lower, predictions_upper, \
-        cur_truth, ground_truth, \
-        res = \
+        cur_truth, ground_truth = \
         validate_all(data, 
                     locations, groups,
                     time_period, first_year, last_year,
@@ -302,15 +304,6 @@ def nowcast_report(path, data,
             plt.savefig(path + '/' + location + '/' + str(group) + '-' +
                         str(left_window) + '-' + str(backfill_window) + '.png', dpi=300)
             plt.close()
-            # plot histogram for training residuals
-            if mode == 'all':
-                plt.figure()
-                plt.hist(res, bins=50, facecolor='g')
-                plt.xlabel('residuals')
-                plt.ylabel('frequencies')
-                plt.savefig(path + '/' + location + '/' + 'hist_' + str(group) + '-' +
-                            str(left_window) + '-' + str(backfill_window) + '.png', dpi=300)
-                plt.close()
         
     return rsq, mse
 
@@ -462,7 +455,7 @@ def predict(data, epiweek,
             # i.e. window and backfill
             for window in range(0, max_window + 1):
                 for backfill in range(1, window + 2):
-                    _, predictions, _, _, _, ground_truth, _ = validate(data, 
+                    _, predictions, _, _, _, ground_truth = validate(data, 
                                                             locations, groups, 
                                                             validate_period, lag=0, 
                                                             left_window=window, right_window=0, 
@@ -477,28 +470,28 @@ def predict(data, epiweek,
             
             # use validation period (i.e. the latest) to train the model
             # and then make predictions
-            X, Y = preparation_loc.prepare(data, 
+            X, Y = preparation.prepare(data, 
                                             locations, groups, 
                                             validate_period, lag=0, 
                                             left_window=optimal_window, right_window=0, 
                                             backfill_window=optimal_backfill)
             # get trained model and residuals
-            model, res = train_model(X, Y, model_type)
-            res_mean_l, res_mean_u = hosp_utils.bootstrap_mean(res, alpha=0.05)
+            model_upper, model, model_lower = train_model(X, Y, model_type)
 
             for l_idx in range(len(locations)):
                 location = locations[l_idx]
 
                 for idx in range(len(groups)):
                     group = groups[idx]
-                    X_pred, _, _ = preparation_loc.fetch(data, 
+                    X_pred, _, _ = preparation.fetch(data, 
                                                         location, group, 
                                                         epiweek, lag=0, 
                                                         left_window=optimal_window, right_window=0, 
                                                         backfill_window=optimal_backfill)
                     # get results from prediction 
+                    pred_u = model_upper.predict(X_pred)
                     pred = model.predict(X_pred)
-                    pred_u, pred_l = pred * (1 + res_mean_u), pred * (1 + res_mean_l)
+                    pred_l = model_lower.predict(X_pred)
                     # add to records
                     cur_preds[l_idx][idx].append(pred)
                     cur_preds_upper[l_idx][idx].append(pred_u)

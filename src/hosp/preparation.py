@@ -41,9 +41,7 @@ def _fill_data(data, max_lag):
     for _, series in data.items():
         # for all series, repeat the last value until length = 52
         final_val = series[-1]
-        series.extend([final_val] * (52 - len(series)))
-
-    return data
+        series.extend([final_val] * (max_lag - len(series)))
 
 def update_data(locations, time_period, max_lag):
     """ 
@@ -74,7 +72,7 @@ def update_data(locations, time_period, max_lag):
                             data[(epiweek, group, location)] = []
                         data[(epiweek, group, location)].append(cur_data['rate_age_' + str(group)])                      
     # fill and save the queried results
-    _fill_data(data)
+    _fill_data(data, max_lag)
     _write_data(data)
     # load queried data into a pickle file
     with open('data.pickle', 'wb') as handle:
@@ -145,14 +143,11 @@ def prepare(data, locations, groups, periods, lag, left_window, right_window, ba
                                         location, group, 
                                         epiweek, lag, 
                                         left_window, right_window, backfill_window)
-                        total_X.append(x)
-                        total_Y.append(y)
-    # compress to train-ready dimensions
-    if len(total_X) > 0:   
-        total_X = np.vstack(total_X).reshape(len(total_X), -1)  
-        total_Y = np.array(total_Y).squeeze()
-    else:
-        total_X = None
-        total_Y = None
+                        if np.any(y):
+                            total_X.append(x)
+                            total_Y.append(y)
+    # compress to train-ready dimensions 
+    total_X = np.vstack(total_X).reshape(len(total_X), -1)  
+    total_Y = np.array(total_Y).squeeze()
     
     return total_X, total_Y

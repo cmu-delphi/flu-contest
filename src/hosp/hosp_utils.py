@@ -3,11 +3,8 @@ utilities for hospitalization data analysis.
 """
 # first party
 import utils.epiweek as utils
-# third party
-import bootstrapped.bootstrap as bs
-import bootstrapped.stats_functions as stat_f
 
-# all states we can query (including the whole network) 
+# all states we can query (including the national network) 
 STATE_LIST = ['ca', 'co', 'ct', 
               'ga', 
               'md', 'mi', 'mn', 
@@ -89,18 +86,4 @@ def ravel(start, end):
     Return:
         A string representation of time period
     """
-    return str(start)+'-'+str(end)
-
-def bootstrap_mean(residuals, alpha):
-    """
-    boostrap the confidence interval of the mean from residuals.
-
-    Args:
-        residuals - the residuals
-        alpha - the significance level
-    
-    Returns:
-        lower_bound, upper_bound - the bound for confidence interval
-    """
-    interval = bs.bootstrap(residuals, stat_f.mean, alpha=alpha)
-    return interval.lower_bound, interval.upper_bound
+    return str(start) + '-' + str(end)
