@@ -203,7 +203,7 @@ class Epicast(Forecaster):
     # get the user submissions (right half) from the database
     submissions = self.fetch_submissions(region, epiweek)
     self._num_users = len(submissions)
-    if self.verbose:
-      print(' [EC] %d users found for %s on %d' % (len(submissions), region, epiweek))
+#     if self.verbose:
+    print(' [EC] %d users found for %s on %d' % (len(submissions), region, epiweek))
     # concatenate observed data and user submissions
     return [pinned + sub for sub in submissions]
