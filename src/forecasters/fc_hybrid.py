@@ -43,6 +43,7 @@ class Hybrid(Forecaster):
     self.future.close()
 
   def _forecast(self, region, epiweek):
+    epiweek = 201841;
     print('inside hybrid._forecast, region, epiweek:', region, epiweek)
     P = self.past._forecast(region, epiweek)
     F = self.future._forecast(region, epiweek)
