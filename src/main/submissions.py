@@ -80,7 +80,7 @@ class Submissions:
 
 
 if __name__ == '__main__':
-  epiweek = EpiDate.today().add_weeks(-2).get_ew()
+  epiweek = EpiDate.today().add_weeks(-1).get_ew()
   print('WARNING: For testing only!')
   print(' - Using very small number of samples')
   print(' - Not uploading submissions to database')
