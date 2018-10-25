@@ -101,10 +101,10 @@ class Plotter:
     regions = ['nat'] + ['hhs%s' % i for i in range(1, 11)]
 
     # TODO: avoid hardcoding these values everywhere
-    baseline_values_2017 = [
-      2.2, 1.4, 3.1, 2.0, 1.9, 1.8, 4.2, 1.9, 1.3, 2.4, 1.4
+    baseline_values_2018 = [
+      2.2, 1.8, 3.1, 2.0, 2.2, 1.8, 4.0, 1.6, 2.2, 2.3, 1.1
     ]
-    baselines = dict((r, v) for (r, v) in zip(regions, baseline_values_2017))
+    baselines = dict((r, v) for (r, v) in zip(regions, baseline_values_2018))
     bin_size = forecasts[0][0].ili_bin_size
 
     # get the somewhat sorted list of all unique locations
