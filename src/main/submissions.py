@@ -29,7 +29,7 @@ from delphi.utils.epidate import EpiDate
 from ..utils.forecast_type import ForecastType
 
 
-SEASON = 2017
+SEASON = 2018
 
 
 class Submissions:
