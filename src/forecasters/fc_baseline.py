@@ -89,6 +89,7 @@ class Baseline(Forecaster):
     ew1 = flu.join_epiweek(self.test_season + 0, 40)
     ew2 = flu.join_epiweek(self.test_season + 1, 24)
     num_weeks = flu.delta_epiweeks(ew1, ew2)
+    print('fetching past data until week %d' %(epiweek))
     observed = self._get_current(region, epiweek, self.forecast_type)
 
     mean, var = self.emp_mean[region].copy(), self.emp_var[region].copy()
