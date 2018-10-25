@@ -43,10 +43,14 @@ class Hybrid(Forecaster):
     self.future.close()
 
   def _forecast(self, region, epiweek):
-    epiweek = 201841;
-    print('inside hybrid._forecast, region, epiweek:', region, epiweek)
-    P = self.past._forecast(region, epiweek)
-    F = self.future._forecast(region, epiweek)
+#     print('inside hybrid._forecast, region, epiweek:', region, epiweek)
+#     P = self.past._forecast(region, epiweek)
+#     F = self.future._forecast(region, epiweek)
+    P = self.past._forecast(region, 201841)
+    F = self.future._forecast(region, 201841)
+    print('temp F length:', len(F))
+    F = self.future._forecast(region, 201842)
+    print('inside hybrid._forecast, len P, len F', len(P), len(F))
     i = flu.delta_epiweeks(flu.join_epiweek(self.test_season, 40), epiweek)
     curves = []
     for j in range(max(len(P), len(F))):
