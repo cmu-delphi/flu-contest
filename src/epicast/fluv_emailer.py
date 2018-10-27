@@ -204,6 +204,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 Dear %s,
 The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming %s.
 Thank you so much for your support and cooperation!
+You will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
  
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
@@ -211,7 +212,7 @@ To login and submit your forecasts, visit http://epicast.org and enter your User
 Thank you again for your participation, and good luck on your forecasts!
 Happy Forecasting!
 -The DELPHI Team
-        '''%(u[1], deadline_day, u[0], score_text),
+        '''%(u[1], '%', deadline_day, u[0], score_text),
         'html': '''
 
 
@@ -220,6 +221,8 @@ Happy Forecasting!
 </p><p>
   The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
   Thank you so much for your support and cooperation!
+</p><p>
+  You will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
 </p><p>
   Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations. For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge.
   Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2016-17 season, in a crowded field of 28 submissions. It was originally developed by David Farrow as part of his PhD thesis.
@@ -232,44 +235,8 @@ Happy Forecasting!
 <br />
   -The DELPHI Team
 </p>
-        '''%(u[1], u[0], u[0], score_html),
+        '''%(u[1], '%', u[0], u[0], score_html),
       },
-      
-      
-      
-# end of forecast year email      
-#       'notifications': {
-#         'subject': 'Thank you for your input this year',
-#         'text': '''
-        
-# Dear %s,
-# Time flies and we’ve reached the end of the 2017-2018 flu forecasting competition. We would like to thank you for your timely and high-quality input throughout this season. 
-# In each of the past 27 weeks, we have generated flu forecast for 11 Health and Human Service regions, 5 states (Pennsylvania, Georgia, Washington DC, Texas and Oregon), and 6 hospitalization age groups. We have achieved top ranks among the participating teams, as well as provided helpful input to health policy makers. We would not have been able to achieve any of these without your help.
-# Accurate forecasting of flu’s spread in different regions is important for many aspects of the society, and Epicast will continue to utilize “Wisdom of the Crowds” to provide useful inputs. We will be participating in the “Predict the Flu” challenge again next year. You can expect to hear from us this coming fall, when we will be inviting you to participate again in this important exercise, and to spread the word to others!
- 
-# Thank you, and have a great year.
-
-# -The DELPHI Team
-#         '''%(u[1]),
-#         'html': '''
-
-
-# <p>
-#   Dear %s,
-# </p><p>
-#   Time flies and we’ve reached the end of the 2017-2018 flu forecasting competition. We would like to thank you for your timely and high-quality input throughout this season. 
-# </p><p>
-#   In each of the past 27 weeks, we have generated flu forecast for 11 Health and Human Service regions, 5 states (Pennsylvania, Georgia, Washington DC, Texas and Oregon), and 6 hospitalization age groups. We have achieved top ranks among the participating teams, as well as provided helpful input to health policy makers. We would not have been able to achieve any of these without your help.
-# </p><p>
-#   Accurate forecasting of flu’s spread in different regions is important for many aspects of the society, and Epicast will continue to utilize “Wisdom of the Crowds” to provide useful inputs. We will be participating in the <a href="https://predict.phiresearchlab.org/">“Predict the Flu” challenge</a> again next year. You can expect to hear from us this coming fall, when we will be inviting you to participate again in this important exercise, and to spread the word to others!
-# </p><p>
-#   Thank you, and have a great year.
-# </p>
-# <br />
-#   -The DELPHI Team
-# </p>
-#         '''%(u[1]),
-#       },
 
       
 ################################################################################
