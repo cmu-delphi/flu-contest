@@ -207,12 +207,12 @@ Thank you so much for your support and cooperation!
 You will notice grey vertical bars on the flu activity levels in the last few weeks of the current season.  This is because these values are subject to future revision.  The vertical bars represent 90%s confidence intervals for where the final values will end up being.
  
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2017-18 season (national and regional forecast), in a crowded field of 30 submissions. It was originally developed by David Farrow as part of his PhD thesis.
-To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
+To login and submit your forecasts, visit http://epicast.org and enter your User ID.
 %s
 Thank you again for your participation, and good luck on your forecasts!
 Happy Forecasting!
 -The DELPHI Team
-        '''%(u[1], '%', deadline_day, u[0], score_text),
+        '''%(u[1], '%', deadline_day, score_text),
         'html': '''
 
 
@@ -227,7 +227,7 @@ Happy Forecasting!
   Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations. For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge.
   Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2017-18 season (national and regional forecast), in a crowded field of 30 submissions. It was originally developed by David Farrow as part of his PhD thesis.
 </p><p>
-  To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
+  To login and submit your forecasts, visit http://epicast.org and enter your User ID.
 </p>%s<p>
   Thank you again for your participation, and good luck on your forecasts!
 </p><p>
@@ -235,7 +235,7 @@ Happy Forecasting!
 <br />
   -The DELPHI Team
 </p>
-        '''%(u[1], '%', u[0], u[0], score_html),
+        '''%(u[1], '%', score_html),
       },
 
       
