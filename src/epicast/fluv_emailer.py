@@ -251,13 +251,13 @@ Dear %s,
 This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
 Thank you so much for your support and cooperation!
 
-To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
+To login and submit your forecasts, visit http://epicast.org and enter your User ID.
 
 
 Happy Forecasting!
 
 -The DELPHI Team
-        '''%(u[1], u[0]),
+        '''%(u[1]),
         'html': '''
 <p>
   Dear %s,
@@ -265,13 +265,13 @@ Happy Forecasting!
   This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
 Thank you so much for your support and cooperation!
 </p><p>
-  To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
+  To login and submit your forecasts, visit http://epicast.org and enter your User ID.
 </p><p>
   Happy Forecasting!
   <br />
   -The DELPHI Team
 </p>
-        '''%(u[1], u[0], u[0]),
+        '''%(u[1]),
       },
 ################################################################################
     }
