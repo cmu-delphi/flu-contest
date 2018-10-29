@@ -88,7 +88,7 @@ if __name__ == '__main__':
   print(' - Assuming last published wILI on %d' % epiweek)
   print(' - Limited locations')
 
-  regions = ['nat', 'hhs1','hhs2','hhs3','hhs4','hhs5','hhs6','hhs7','hhs8','hhs9','hhs10', 'pa', 'ga', 'tx', 'or', 'dc']
+  regions = ['nat', 'hhs1','hhs2','hhs3','hhs4','hhs5','hhs6','hhs7','hhs8','hhs9','hhs10', 'ga', 'dc', 'ca']
   sub = Submissions(regions, 10000)
   ec, af = None, None
   ec = sub.run_epicast(epiweek, 0.001, 0.001)
