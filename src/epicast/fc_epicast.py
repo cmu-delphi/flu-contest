@@ -201,7 +201,6 @@ class Epicast(Forecaster):
     if len(pinned) != flu.delta_epiweeks(ew1, epiweek) + 1:
       raise Exception('missing ILINet data')
     # get the user submissions (right half) from the database
-    epiweek = 201842
     submissions = self.fetch_submissions(region, epiweek)
     self._num_users = len(submissions)
     print(' [EC] %d users found for %s on %d' % (len(submissions), region, epiweek))
