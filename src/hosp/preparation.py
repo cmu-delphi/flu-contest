@@ -5,6 +5,8 @@ from __future__ import division, print_function
 # first party
 import utils.epiweek as utils
 import flu_contest.src.hosp.hosp_utils as hosp_utils 
+
+from flu_contest.src.hosp.tools import *
 from delphi_epidata.src.client.delphi_epidata import Epidata
 # third party
 import pickle
@@ -12,45 +14,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-def _write_data(data):
-    """
-    write the data to a text file (data.txt) for viewing.
-
-    Args: 
-        data - the data source (as python dictionary)
-    
-    Returns:
-        None
-    """
-    f = open('data.txt', mode='w')
-    # sort the keys for viewing
-    for key in sorted(data.keys()):
-        f.write(str(key) + ';' + str(data[key]) + '\n')
-    f.close()
-
-def _fill_data(data, max_lag):
-    """
-    fill the series to length 52 (i.e. a year)
-
-    Args:
-        data - the data source (included all epiweeks with all lags)
-    
-    Returns:
-        the modified data source
-    """
-    for _, series in data.items():
-        # for all series, repeat the last value until length = 52
-        final_val = series[-1]
-        series.extend([final_val] * (max_lag - len(series)))
-
 def update_data(locations, time_period, max_lag):
     """ 
     Query data from flusurv API to update data for a time period.
 
     Args:
         locations - the locations we query from
-        time_period - a string representing the starting and 
-                        ending epiweek
+        time_period - a string representing the starting and ending epiweek
         max_lag - the maximum time lag to consider for each epiweek
     
     Returns:
@@ -62,18 +32,19 @@ def update_data(locations, time_period, max_lag):
 
     for epiweek in tqdm(period):
         for location in tqdm(locations):
+            # for a combination of location and epiweek, query from 0 to maximum lag
             for l in range(max_lag + 1):
-                # for a combination of location and epiweek, query from 0 to maximum lag
                 current = Epidata.flusurv(location, epiweek, lag=l)
                 if 'epidata' in current:
                     cur_data = current['epidata'][0]
+                    # if record exists, query each age group
                     for group in range(5):
                         if (epiweek, group, location) not in data:
                             data[(epiweek, group, location)] = []
                         data[(epiweek, group, location)].append(cur_data['rate_age_' + str(group)])                      
     # fill and save the queried results
-    _fill_data(data, max_lag)
-    _write_data(data)
+    fill_data(data, max_lag)
+    write_data(data, 'data.txt')
     # load queried data into a pickle file
     with open('data.pickle', 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -81,7 +52,7 @@ def update_data(locations, time_period, max_lag):
 
 def fetch(data, location, group, epiweek, lag, left_window, right_window, backfill_window):
     """ 
-    fetch data for a time period specified by epiweek and time window.
+    fetch data for a location and age group specified by epiweek and time window.
 
     Args:
         data - the data source (included all epiweeks with all lags)
@@ -98,21 +69,24 @@ def fetch(data, location, group, epiweek, lag, left_window, right_window, backfi
     """
     # get the time period
     period = hosp_utils.get_window(epiweek, left_window, right_window)
-    # initialize data
+    # ground truth and the first release
     cur_y = data[(epiweek, group, location)][lag]
     y = data[(epiweek, group, location)][-1:]
+    # create x, and fill entries by 0
     x = np.zeros((left_window + right_window + 1, backfill_window + 1))
     
     for pos, epiweek in enumerate(period):
-        # for each epiweek, collect testing data for regression
+        # for each epiweek, collect data for regression
         if (epiweek, group, location) in data:
             record = data[(epiweek, group, location)]
+            # take the data from start_ind with fill_length
             start_ind = lag - pos + left_window - backfill_window
             fill_length = max(0, lag - pos + left_window + 1) - max(0, start_ind)
             x[pos, backfill_window + 1 - fill_length:] = \
                 record[max(0, start_ind): max(0, lag - pos + left_window + 1)]
-    
-    return x.reshape(-1, 1), cur_y, y
+    # vectorize collected data
+    x = x.reshape(-1, 1)
+    return x, cur_y, y
 
 def prepare(data, locations, groups, periods, lag, left_window, right_window, backfill_window):
     """
@@ -128,6 +102,7 @@ def prepare(data, locations, groups, periods, lag, left_window, right_window, ba
             [epiweek - left_window, epiweek + right_window]
         backfill_window - the "width" of backfill
     """
+    # collector
     total_X = []
     total_Y = []
 
@@ -137,17 +112,16 @@ def prepare(data, locations, groups, periods, lag, left_window, right_window, ba
         for epiweek in period:
             for location in locations:
                 for group in groups:
+                    # fetch the data for each epiweek, location and group within the period
                     if (epiweek, group, location) in data:
-                        # fetch the data for each epiweek, location and group within the period
                         x, _, y = fetch(data, 
-                                        location, group, 
-                                        epiweek, lag, 
-                                        left_window, right_window, backfill_window)
+                                        location, group, epiweek, 
+                                        lag, left_window, right_window, backfill_window)
+                        # if data exists, add to collector
                         if np.any(y):
                             total_X.append(x)
                             total_Y.append(y)
-    # compress to train-ready dimensions 
+    # vectorize data
     total_X = np.vstack(total_X).reshape(len(total_X), -1)  
     total_Y = np.array(total_Y).squeeze()
-    
     return total_X, total_Y

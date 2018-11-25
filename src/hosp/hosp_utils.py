@@ -4,30 +4,6 @@ utilities for hospitalization data analysis.
 # first party
 import utils.epiweek as utils
 
-# all states we can query (including the national network) 
-STATE_LIST = ['ca', 'co', 'ct', 
-              'ga', 
-              'md', 'mi', 'mn', 
-              'nm',  
-              'oh', 'or', 
-              'tn', 'ut',
-              'network_all']
-
-def create_double_list(obj, dim_x, dim_y):
-    """
-    create a 2-dimensional list copies for an object.
-    all objects in the list are deep copies of the object.
-
-    Args:
-        obj - the original object
-        dim_x - the first dimension of the double list
-        dim_y - the second dimension of the double list
-    
-    Returns:
-        the 2-dimensional list copies of the object
-    """
-    return [list(obj for _ in range(dim_y)) for _ in range(dim_x)]
-
 def get_window(epiweek, left_window, right_window):
     """
     generate a time period [epiweek-left_window, epiweek+right_window]
@@ -55,8 +31,8 @@ def get_season(time_period):
         start_year, end_year - the starting and ending year
     """
     start, end = time_period.split('-')
-    start_year = (int(start) - 40) // 100
-    end_year = (int(end) - 40) // 100
+    start_year = int(start) // 100
+    end_year = int(end) // 100
 
     return start_year, end_year
 
