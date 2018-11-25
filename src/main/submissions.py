@@ -29,7 +29,7 @@ from delphi.utils.epidate import EpiDate
 from ..utils.forecast_type import ForecastType
 
 
-SEASON = 2017
+SEASON = 2018
 
 
 class Submissions:
@@ -80,7 +80,7 @@ class Submissions:
 
 
 if __name__ == '__main__':
-  epiweek = EpiDate.today().add_weeks(-2).get_ew()
+  epiweek = EpiDate.today().add_weeks(-1).get_ew()
   print('WARNING: For testing only!')
   print(' - Using very small number of samples')
   print(' - Not uploading submissions to database')
@@ -88,7 +88,8 @@ if __name__ == '__main__':
   print(' - Assuming last published wILI on %d' % epiweek)
   print(' - Limited locations')
 
-  sub = Submissions(['nat', 'hhs5', 'pa'], 1000)
+  regions = ['nat', 'hhs1','hhs2','hhs3','hhs4','hhs5','hhs6','hhs7','hhs8','hhs9','hhs10', 'ga', 'dc', 'ca']
+  sub = Submissions(regions, 10000)
   ec, af = None, None
   ec = sub.run_epicast(epiweek, 0.001, 0.001)
   #af = sub.run_archefilter(epiweek, 0.002, 0.002, num_samples=1000)

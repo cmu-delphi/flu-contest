@@ -89,6 +89,7 @@ class Baseline(Forecaster):
     ew1 = flu.join_epiweek(self.test_season + 0, 40)
     ew2 = flu.join_epiweek(self.test_season + 1, 24)
     num_weeks = flu.delta_epiweeks(ew1, ew2)
+    print('fetching past data until week %d' %(epiweek))
     observed = self._get_current(region, epiweek, self.forecast_type)
 
     mean, var = self.emp_mean[region].copy(), self.emp_var[region].copy()
@@ -141,6 +142,8 @@ class Baseline(Forecaster):
     ew2 = flu.join_epiweek(self.test_season + 1, 20)
     weeks = Epidata.range(ew1, ew2)
     if self.forecast_type == ForecastType.WILI:
+        print('fetching history data for:')
+        print(region, epiweek, weeks)
         epidata = Forecaster.Utils.decode(Epidata.fluview(region, weeks, issues=epiweek))
         data = [row['wili'] for row in epidata]
         # print (data)

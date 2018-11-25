@@ -16,7 +16,7 @@ from delphi.utils.epidate import EpiDate
 from ..utils.forecast_type import ForecastType
 
 
-SEASON = 2017
+SEASON = 2018
 
 
 class Submissions:
@@ -51,7 +51,7 @@ class Submissions:
 
 
 if __name__ == '__main__':
-  epiweek = EpiDate.today().add_weeks(-2).get_ew()
+  epiweek = EpiDate.today().add_weeks(-1).get_ew()
   print("epiweek: ", epiweek)
   print('WARNING: For testing only!')
   print(' - Using very small number of samples')
