@@ -30,12 +30,12 @@ def train_model(X, Y, model_type):
     Args:
         X - training input
         Y - training output
-        model_type - the type of machine learning model
+        model_type - the name of machine learning model
     
     Returns:
         model - the trained machine learning model
     """
-    # build model
+    # determine if co-training is necessary
     cotrain = (model_type == 'quant_lin' or model_type == 'quant_ridge')
 
     if cotrain:
@@ -76,7 +76,6 @@ def train_model(X, Y, model_type):
 def validate(data, 
             locations, groups, 
             time_period, lag, 
-            first_year, year_window,
             left_window, right_window, backfill_window,
             mode, model_type):
     """
@@ -89,13 +88,13 @@ def validate(data,
         groups - the list of groups for machine learning model
         time_period - a string representing the starting and ending epiweek
         lag - the current time lag
-        first_year - the starting year for data
-        year_window - the training period for 'prev' mode is
-            [cur_period - year_window, cur_period - 1]
         left_window, right_window - the time period considered for regression: 
             [cur_time - left_window, cur_time + right_window]
         backfill_window - the backfill period: [cur_time-window, cur_time]
-        group - the current age group. (as a index from 0 to 4)
+        mode - the training scheme.
+            prev: use the seasons within year window as training data
+            all: use all previous seasons as training data
+        model_type - the name of machine learning model
     
     Returns:
         valid_weeks - the active epiweeks for flu
@@ -104,27 +103,23 @@ def validate(data,
         cur_truth - the final value of series at current time
         ground_truth - the final values provided by CDC after backfill
     """
-    start_year, _ = hosp_utils.get_season(time_period)
+    start_year = hosp_utils.get_start_year(time_period[0])
     period = hosp_utils.unravel(time_period)
     model_periods = []
 
     # obtain all training seasons
     if mode == 'all':
-        for year in range(first_year, start_year):
-            start_week = year * 100 + 44
-            end_week = (year + 1) * 100 + 17
-            model_periods.append(hosp_utils.ravel(start_week, end_week))
+        for year in range(FIRST_YEAR, start_year):
+            model_periods.append(hosp_utils.get_period(year, 40, 17))
     elif mode == 'prev':
-        for year in range(max(first_year, start_year - year_window), start_year):
-            start_week = year * 100 + 44
-            end_week = (year + 1) * 100 + 17
-            model_periods.append(hosp_utils.ravel(start_week, end_week))
-    # train model and calculate confidence interval
+        for year in range(max(FIRST_YEAR, start_year - YEAR_WINDOW), start_year):
+            model_periods.append(hosp_utils.get_period(year, 40, 17))
+    # train models
     X, Y = preparation.prepare(data, locations, groups, 
-                                    model_periods, lag, 
-                                    left_window, right_window, backfill_window)
+                                model_periods, lag, 
+                                left_window, right_window, backfill_window)
     model_upper, model, model_lower = train_model(X, Y, model_type)
-    # initialize
+    # result collectors
     predictions = create_double_list([], len(locations), len(groups))
     predictions_lower = create_double_list([], len(locations), len(groups))
     predictions_upper = create_double_list([], len(locations), len(groups))
@@ -137,10 +132,11 @@ def validate(data,
 
         for epiweek in period:
             valid_weeks.append(epiweek)
-            # iterate over groups
+
             for idx in range(len(groups)):
                 group = groups[idx]
 
+                # if data exists, perform cross-validation
                 if (epiweek, group, location) in data:
                     x_val, cur_y_val, y_val = preparation.fetch(data, location, group, 
                                                                 epiweek, lag, 
@@ -149,7 +145,7 @@ def validate(data,
                     pred = model.predict(x_val.T)
                     pred_u = model_upper.predict(x_val.T)
                     pred_l = model_lower.predict(x_val.T)
-                    # record the results
+                    # record results
                     predictions[l_idx][idx].append(pred)
                     predictions_lower[l_idx][idx].append(pred_l)
                     predictions_upper[l_idx][idx].append(pred_u)
@@ -163,11 +159,10 @@ def validate(data,
 def nowcast_report(path, data, 
                     locations, groups, 
                     time_period, 
-                    first_year, year_window,
                     left_window, backfill_window, 
                     mode, model_type):
     """
-    generate a report for linear regression.
+    calculate metric for linear regression and plot prediction results.
 
     Args:
         path - the path where tables and graphs are generated.
@@ -175,12 +170,11 @@ def nowcast_report(path, data,
         locations - the locations to report
         groups - the groups to report
         time_period - a string representing the starting and ending epiweek
-        first_year - the starting year for data
-        year_window - the training period for 'prev' mode is
-            [cur_period - year_window, cur_period - 1]
-        left_window - the time period considered for linear regression: [cur_time-left_window, cur_time]
-        backfill_window - the time period considered for backfill: [cur_time-window, cur_time]
-        mode - 
+        left_window - the time period considered for linear regression: 
+            [cur_time-left_window, cur_time]
+        backfill_window - the time period considered for backfill: 
+            [cur_time-backfill_window, cur_time]
+        mode - the training scheme.
             prev: use the seasons within year window as training data
             all: use all previous seasons as training data
         model_type - the machine learning model used
@@ -189,7 +183,7 @@ def nowcast_report(path, data,
         rsq - the explained variance statistics of prediction
         mse - the mean squared error of prediction
     """
-    # initialize
+    # result collectors
     rsq = create_double_list(None, len(locations), len(groups))
     mse = create_double_list(None, len(locations), len(groups))
     # run cross validation and calculate statistics
@@ -199,11 +193,9 @@ def nowcast_report(path, data,
     validate(data, 
             locations, groups,
             time_period, lag=0, 
-            first_year=first_year, year_window=year_window,
             left_window=left_window, right_window=0, 
             backfill_window=backfill_window, 
-            mode=mode,
-            model_type=model_type)
+            mode=mode, model_type=model_type)
 
     for l_idx in range(len(locations)):
         location = locations[l_idx]
@@ -249,18 +241,17 @@ def plot_results(path, results, name, location, group, colormap):
     Returns:
         None
     """
-    descriptions = ['Ages 0-4', 'Ages 5-17', 'Ages 18-49', 
-                    'Ages 50-64', 'Ages 65+']
     length, width = results.shape
     fig, ax = plt.subplots()
     ax.imshow(results, cmap=colormap)
 
-    ax.set_title(descriptions[group])
+    ax.set_title(GROUP_DESCRIPTIONS[group])
     ax.set_ylabel('window')
     ax.set_xlabel('backfill')
     ax.set_yticks(range(length))
     ax.set_xticks(range(width))
 
+    # fill each square by statistic
     for i in range(length):
         for j in range(i+1):
             ax.text(j, i, '{:.2f}'.format(results[i][j]), ha='center', va='center', color='w')
@@ -272,22 +263,18 @@ def plot_results(path, results, name, location, group, colormap):
 def run_nowcast_experiment(data, 
                             location_groups, groupings, 
                             time_periods, 
-                            first_year, year_window,
                             max_window, 
                             mode, model_type):
     """
-    run nowcasting experiments for different time periods.
+    run nowcast experiments for different time periods.
 
     Args:
         data - the data source (included all epiweeks with all lags)
         location_groups - the groupings for states
         groupings - the groupings for age groups
         time_periods - a list of time period (strings representing the starting and ending epiweek)
-        first_year - the starting year for data
-        year_window - the training period for 'prev' mode is
-            [cur_period - year_window, cur_period - 1]
         max_window - the maximum time window considered in experiment
-        mode - 
+        mode - the training scheme.
             prev: use the seasons within year window as training data
             all: use all previous seasons as training data
         model_type - the machine learning model used
@@ -319,11 +306,10 @@ def run_nowcast_experiment(data,
                 for window in tqdm(range(max_window + 1)):
                     for backfill in range(window + 1):
                         rsq, mse = nowcast_report(report_path, data, 
-                                                    locations, groups, 
-                                                    period, 
-                                                    first_year, year_window,
-                                                    left_window=window, backfill_window=backfill, 
-                                                    mode=mode, model_type=model_type)
+                                                locations, groups, 
+                                                period, 
+                                                left_window=window, backfill_window=backfill, 
+                                                mode=mode, model_type=model_type)
 
                         for l_idx in range(len(locations)):
                             for idx in range(len(groups)):
@@ -335,49 +321,48 @@ def run_nowcast_experiment(data,
 
                     for idx in range(len(groups)):
                         group = groups[idx]
-                        results[(period, group)] = np.amax(rsq_results[l_idx][idx])
 
                         plot_results(report_path, mse_results[l_idx][idx], 
                                     'mse', location, group, 'Reds')
                         plot_results(report_path, rsq_results[l_idx][idx], 
                                     'rsq', location, group, 'Blues')
+                        # set the maximum as model metric
+                        results[(period, group)] = np.amax(rsq_results[l_idx][idx])
 
     write_data(results, './nowcast/results.txt')
 
-"""
-#TODO: PREDICTION
-"""
-
 def predict(data, epiweek, 
             location_groups, groupings, 
-            prediction_window, max_window, 
-            max_backfill, 
-            model_type):
+            max_window, 
+            mode, model_type):
     """
+    #TODO: support location / age group combination
+
     perform prediction for specific epiweek.
+    
+    choose slabs (i.e. window and backfill window) as following:
+        consider combinations (0, 0), (1, 1), (2, 2),
+        add R^2 penalty of 0.04 * window_size
 
     Args:
-        data - the data source (included all epiweeks with all lags)
+        data - the data source
         epiweek - the epiweek for which we predict the final value
         location_groups - the grouping of all locations
         groupings - the grouping of all age groups
-        prediction_window - 
-            the window for: 
-                1. optimal hyperparameters search by cross validation
-                2. model training for current prediction
         max_window - the maximum time window considered in modeling
-        max_backfill - the maximum backfill considered in modeling
         model_type - the type of machine learning model used
+        mode - the training scheme.
+            prev: use the seasons within year window as training data
+            all: use all previous seasons as training data
     
     Returns:
-        preds, preds_upper, preds_lower - the prediiction results
+        preds, preds_upper, preds_lower - the prediction results
     """
     # create cross-validation period
-    year, week = utils.split_epiweek(epiweek)
-    val_end = utils.join_epiweek(year - 1, week)
-    val_start = utils.add_epiweeks(val_end, -prediction_window)
-    validate_period = hosp_utils.ravel(val_start, val_end)
-
+    start_year = hosp_utils.get_start_year(epiweek)
+    max_window = min(max_window, hosp_utils.get_max_window(epiweek))
+    val_period = hosp_utils.get_period(start_year - 1, 40, 17)
+    # result collectors
     preds = create_double_list(None, len(location_groups), len(groupings))
     preds_upper = create_double_list(None, len(location_groups), len(groupings))
     preds_lower = create_double_list(None, len(location_groups), len(groupings))
@@ -392,33 +377,33 @@ def predict(data, epiweek,
             cur_preds_upper = create_double_list([], len(locations), len(groups))
             cur_preds_lower = create_double_list([], len(locations), len(groups))
 
-            optimal_window = optimal_backfill = 0
-            cur_rsq = 0
+            opt_window = 0
+            cur_rsq = 0.0
 
             # perform cross-validation and select the optimal hyperparameters, 
             # i.e. window and backfill
             for window in range(0, max_window + 1):
-                for backfill in range(1, window + 2):
-                    _, predictions, _, _, _, ground_truth = validate(data, 
-                                                            locations, groups, 
-                                                            validate_period, lag=0, 
-                                                            left_window=window, right_window=0, 
-                                                            backfill_window=backfill,
-                                                            model_type=model_type)
-                    rsq = metrics.explained_variance_score(ground_truth, predictions)
+                _, predictions, _, _, _, ground_truth = validate(data, 
+                                                        locations, groups, 
+                                                        val_period, lag=0, 
+                                                        left_window=window, right_window=0, 
+                                                        backfill_window=window,
+                                                        model_type=model_type, mode=mode)
+                predictions = np.vstack(predictions[0][0]).squeeze()
+                ground_truth = np.vstack(ground_truth[0][0]).squeeze()
+                rsq = metrics.r2_score(ground_truth, predictions) - PENALTY * window
 
-                    if rsq > cur_rsq:
-                        optimal_window = window
-                        optimal_backfill = backfill
-                        cur_rsq = rsq
+                if rsq > cur_rsq:
+                    opt_window = window
+                    cur_rsq = rsq
             
             # use validation period (i.e. the latest) to train the model
             # and then make predictions
             X, Y = preparation.prepare(data, 
                                     locations, groups, 
-                                    validate_period, lag=0, 
-                                    left_window=optimal_window, right_window=0, 
-                                    backfill_window=optimal_backfill)
+                                    [val_period], lag=0, 
+                                    left_window=opt_window, right_window=0, 
+                                    backfill_window=opt_window)
             # get trained model and residuals
             model_upper, model, model_lower = train_model(X, Y, model_type)
 
@@ -428,14 +413,14 @@ def predict(data, epiweek,
                 for idx in range(len(groups)):
                     group = groups[idx]
                     X_pred, _, _ = preparation.fetch(data, 
-                                                        location, group, 
-                                                        epiweek, lag=0, 
-                                                        left_window=optimal_window, right_window=0, 
-                                                        backfill_window=optimal_backfill)
+                                                    location, group, 
+                                                    epiweek, lag=0, 
+                                                    left_window=opt_window, right_window=0, 
+                                                    backfill_window=opt_window)
                     # get results from prediction 
-                    pred_u = model_upper.predict(X_pred)
-                    pred = model.predict(X_pred)
-                    pred_l = model_lower.predict(X_pred)
+                    pred_u = model_upper.predict(X_pred.T)
+                    pred = model.predict(X_pred.T)
+                    pred_l = model_lower.predict(X_pred.T)
                     # add to records
                     cur_preds[l_idx][idx].append(pred)
                     cur_preds_upper[l_idx][idx].append(pred_u)
@@ -448,11 +433,11 @@ def predict(data, epiweek,
                                                 cur_preds[l_idx][idx], axis=0).squeeze()
                     cur_preds_upper[l_idx][idx] = np.concatenate(
                                                 cur_preds_upper[l_idx][idx], axis=0).squeeze()
-                    preds_lower[l_idx][idx] = np.concatenate(
+                    cur_preds_lower[l_idx][idx] = np.concatenate(
                                                 cur_preds_lower[l_idx][idx], axis=0).squeeze()
             
             preds[lg_idx][g_idx] = cur_preds
             preds_upper[lg_idx][g_idx] = cur_preds_upper
             preds_lower[lg_idx][g_idx] = cur_preds_lower
-
+    
     return preds, preds_upper, preds_lower

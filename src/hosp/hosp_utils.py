@@ -20,21 +20,61 @@ def get_window(epiweek, left_window, right_window):
     end = utils.add_epiweeks(epiweek, right_window)
     return utils.range_epiweeks(start, end, inclusive=True)
 
-def get_season(time_period):
+def get_start_year(epiweek):
     """ 
-    return the epiweek range of the flu season containing the epiweek.
+    return the starting and ending year of the flu season for an epiweek.
 
     Args:
-        time_period - the string representation of time period
+        epiweek - the epiweek for season query
     
     Returns:
-        start_year, end_year - the starting and ending year
+        the starting year of the season
     """
-    start, end = time_period.split('-')
-    start_year = int(start) // 100
-    end_year = int(end) // 100
+    year, week = utils.split_epiweek(epiweek)
+    if week <= 20:
+        return year - 1
+    elif week >= 40:
+        return year
 
-    return start_year, end_year
+def get_period(year, start_week, end_week):
+    """
+    return the corresponding period for a starting year, 
+        starting week, and ending week.
+
+    Args:
+        year - the start year for a season.
+        start_week - the starting week within the season.
+        end_week - the ending week within the season.
+    
+    Returns:
+        the starting and ending epiweek of the period.
+    """
+    if start_week <= end_week:
+        if end_week <= 30:
+            return utils.join_epiweek(year + 1, start_week), \
+                utils.join_epiweek(year + 1, end_week)
+        else:
+            return utils.join_epiweek(year, start_week), \
+                utils.join_epiweek(year, end_week)
+    else:
+        return utils.join_epiweek(year, start_week), \
+            utils.join_epiweek(year + 1, end_week)
+
+def get_max_window(epiweek):
+    """
+    obtain the maximum window applicable for an epiweek.
+
+    Args:
+        epiweek - the current epiweek.
+    
+    Returns:
+        max_window - the maximum window.
+    """
+    start_year = get_start_year(epiweek)
+    start_week = utils.join_epiweek(start_year, 40)
+    max_window = utils.delta_epiweeks(start_week, epiweek)
+
+    return max_window
 
 def unravel(time_period):
     """
@@ -46,20 +86,4 @@ def unravel(time_period):
     Returns:
         A generator of epiweeks within the period
     """
-    timeframe = time_period.split('-')
-    start = int(timeframe[0])
-    end = int(timeframe[1])
-    return utils.range_epiweeks(start, end, inclusive=True)
-
-def ravel(start, end):
-    """
-    given start and end of a time period, return the string representation of that period. 
-
-    Args:
-        start - the starting epiweek
-        end - the ending epiweek
-    
-    Return:
-        A string representation of time period
-    """
-    return str(start) + '-' + str(end)
+    return utils.range_epiweeks(time_period[0], time_period[1], inclusive=True)

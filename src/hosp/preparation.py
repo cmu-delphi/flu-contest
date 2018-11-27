@@ -1,10 +1,9 @@
 """
 data preparation procedures for final value prediction task.
 """
-from __future__ import division, print_function
 # first party
 import utils.epiweek as utils
-import flu_contest.src.hosp.hosp_utils as hosp_utils 
+import flu_contest.src.hosp.hosp_utils as hosp_utils
 
 from flu_contest.src.hosp.tools import *
 from delphi_epidata.src.client.delphi_epidata import Epidata
@@ -12,6 +11,7 @@ from delphi_epidata.src.client.delphi_epidata import Epidata
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
+
 from tqdm import tqdm
 
 def update_data(locations, time_period, max_lag):
@@ -117,7 +117,7 @@ def prepare(data, locations, groups, periods, lag, left_window, right_window, ba
                         x, _, y = fetch(data, 
                                         location, group, epiweek, 
                                         lag, left_window, right_window, backfill_window)
-                        # if data exists, add to collector
+                        # if data exists, collect
                         if np.any(y):
                             total_X.append(x)
                             total_Y.append(y)
