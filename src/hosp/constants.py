@@ -1,7 +1,6 @@
 # all locations we can query
 STATE_LIST = [
-            #   'ca', 'co', 'ct', 
-            #   'ga', 
+              'ga', 'or',
             #   'md', 'mi', 'mn', 
             #   'nm',  
             #   'oh', 'or', 

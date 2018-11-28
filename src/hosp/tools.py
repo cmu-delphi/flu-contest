@@ -16,6 +16,12 @@ def create_double_list(obj, dim_x, dim_y):
     """
     return [list(deepcopy(obj) for _ in range(dim_y)) for _ in range(dim_x)]
 
+def flatten_double_list(double_list):
+    """
+    flatten a double list into a single list.
+    """
+    return [obj for single_list in double_list for obj in single_list]
+
 def write_data(data, file_name):
     """
     write the data to a text file (data.txt) for viewing.

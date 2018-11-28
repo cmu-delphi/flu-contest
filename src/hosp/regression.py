@@ -127,14 +127,14 @@ def validate(data,
     cur_truth = create_double_list([], len(locations), len(groups))
     valid_weeks = []
 
-    for l_idx in range(len(locations)):
-        location = locations[l_idx]
+    for epiweek in period:
+        valid_weeks.append(epiweek)
 
-        for epiweek in period:
-            valid_weeks.append(epiweek)
+        for l_idx in range(len(locations)):
+            location = locations[l_idx]
 
-            for idx in range(len(groups)):
-                group = groups[idx]
+            for g_idx in range(len(groups)):
+                group = groups[g_idx]
 
                 # if data exists, perform cross-validation
                 if (epiweek, group, location) in data:
@@ -146,15 +146,15 @@ def validate(data,
                     pred_u = model_upper.predict(x_val.T)
                     pred_l = model_lower.predict(x_val.T)
                     # record results
-                    predictions[l_idx][idx].append(pred)
-                    predictions_lower[l_idx][idx].append(pred_l)
-                    predictions_upper[l_idx][idx].append(pred_u)
+                    predictions[l_idx][g_idx].append(pred)
+                    predictions_lower[l_idx][g_idx].append(pred_l)
+                    predictions_upper[l_idx][g_idx].append(pred_u)
                     # record ground truth
-                    cur_truth[l_idx][idx].append(cur_y_val)
-                    ground_truth[l_idx][idx].append(y_val)
+                    cur_truth[l_idx][g_idx].append(cur_y_val)
+                    ground_truth[l_idx][g_idx].append(y_val)
     
     return valid_weeks, predictions, predictions_lower, predictions_upper, \
-            cur_truth, ground_truth
+        cur_truth, ground_truth
 
 def nowcast_report(path, data, 
                     locations, groups, 
@@ -200,22 +200,22 @@ def nowcast_report(path, data,
     for l_idx in range(len(locations)):
         location = locations[l_idx]
 
-        for idx in range(len(groups)): 
-            group = groups[idx]
-            rsq[l_idx][idx] = metrics.r2_score(
-                                ground_truth[l_idx][idx], predictions[l_idx][idx])
-            mse[l_idx][idx] = metrics.mean_squared_error(
-                                ground_truth[l_idx][idx], predictions[l_idx][idx])
+        for g_idx in range(len(groups)): 
+            group = groups[g_idx]
+            rsq[l_idx][g_idx] = metrics.r2_score(
+                                ground_truth[l_idx][g_idx], predictions[l_idx][g_idx])
+            mse[l_idx][g_idx] = metrics.mean_squared_error(
+                                ground_truth[l_idx][g_idx], predictions[l_idx][g_idx])
             # plot with epiweeks as ticks for x-axis
             inds = range(len(valid_weeks))
             week_ticks = [str(epiweek % 100) for epiweek in valid_weeks]
             # plot predicted rate, true rate, and current rate
             plt.figure()
-            plt.plot(inds, predictions[l_idx][idx], label='predicted rate')
-            plt.plot(inds, predictions_upper[l_idx][idx], label='predicted rate upper bound')
-            plt.plot(inds, predictions_lower[l_idx][idx], label='predicted rate lower bound')
-            plt.plot(inds, cur_truth[l_idx][idx], label='current rate')
-            plt.plot(inds, ground_truth[l_idx][idx], label='true rate')
+            plt.plot(inds, predictions[l_idx][g_idx], label='predicted rate')
+            plt.plot(inds, predictions_upper[l_idx][g_idx], label='predicted rate upper bound')
+            plt.plot(inds, predictions_lower[l_idx][g_idx], label='predicted rate lower bound')
+            plt.plot(inds, cur_truth[l_idx][g_idx], label='current rate')
+            plt.plot(inds, ground_truth[l_idx][g_idx], label='true rate')
             plt.xticks(inds, week_ticks, rotation='vertical')
             plt.xlabel('weeks')
             plt.ylabel('hospitalized rate')
@@ -312,22 +312,22 @@ def run_nowcast_experiment(data,
                                                 mode=mode, model_type=model_type)
 
                         for l_idx in range(len(locations)):
-                            for idx in range(len(groups)):
-                                mse_results[l_idx][idx][window][backfill] = mse[l_idx][idx]
-                                rsq_results[l_idx][idx][window][backfill] = rsq[l_idx][idx]
+                            for g_idx in range(len(groups)):
+                                mse_results[l_idx][g_idx][window][backfill] = mse[l_idx][g_idx]
+                                rsq_results[l_idx][g_idx][window][backfill] = rsq[l_idx][g_idx]
                 # plot the results
                 for l_idx in range(len(locations)):
                     location = locations[l_idx]
 
-                    for idx in range(len(groups)):
-                        group = groups[idx]
+                    for g_idx in range(len(groups)):
+                        group = groups[g_idx]
 
-                        plot_results(report_path, mse_results[l_idx][idx], 
+                        plot_results(report_path, mse_results[l_idx][g_idx], 
                                     'mse', location, group, 'Reds')
-                        plot_results(report_path, rsq_results[l_idx][idx], 
+                        plot_results(report_path, rsq_results[l_idx][g_idx], 
                                     'rsq', location, group, 'Blues')
                         # set the maximum as model metric
-                        results[(period, group)] = np.amax(rsq_results[l_idx][idx])
+                        results[(period, group)] = np.amax(rsq_results[l_idx][g_idx])
 
     write_data(results, './nowcast/results.txt')
 
@@ -350,10 +350,10 @@ def predict(data, epiweek,
         location_groups - the grouping of all locations
         groupings - the grouping of all age groups
         max_window - the maximum time window considered in modeling
-        model_type - the type of machine learning model used
         mode - the training scheme.
             prev: use the seasons within year window as training data
             all: use all previous seasons as training data
+        model_type - the type of machine learning model used
     
     Returns:
         preds, preds_upper, preds_lower - the prediction results
@@ -362,16 +362,13 @@ def predict(data, epiweek,
     start_year = hosp_utils.get_start_year(epiweek)
     max_window = min(max_window, hosp_utils.get_max_window(epiweek))
     val_period = hosp_utils.get_period(start_year - 1, 40, 17)
-    # result collectors
-    preds = create_double_list(None, len(location_groups), len(groupings))
-    preds_upper = create_double_list(None, len(location_groups), len(groupings))
-    preds_lower = create_double_list(None, len(location_groups), len(groupings))
+    preds, preds_upper, preds_lower = {}, {}, {}
 
     for lg_idx in range(len(location_groups)):
         locations = location_groups[lg_idx]
 
-        for g_idx in range(len(groupings)):
-            groups = groupings[g_idx]
+        for gp_idx in range(len(groupings)):
+            groups = groupings[gp_idx]
 
             cur_preds = create_double_list([], len(locations), len(groups))
             cur_preds_upper = create_double_list([], len(locations), len(groups))
@@ -389,8 +386,9 @@ def predict(data, epiweek,
                                                         left_window=window, right_window=0, 
                                                         backfill_window=window,
                                                         model_type=model_type, mode=mode)
-                predictions = np.vstack(predictions[0][0]).squeeze()
-                ground_truth = np.vstack(ground_truth[0][0]).squeeze()
+                # calculate metrics and compare
+                predictions = np.vstack(flatten_double_list(predictions)).squeeze()
+                ground_truth = np.vstack(flatten_double_list(ground_truth)).squeeze()
                 rsq = metrics.r2_score(ground_truth, predictions) - PENALTY * window
 
                 if rsq > cur_rsq:
@@ -410,8 +408,8 @@ def predict(data, epiweek,
             for l_idx in range(len(locations)):
                 location = locations[l_idx]
 
-                for idx in range(len(groups)):
-                    group = groups[idx]
+                for g_idx in range(len(groups)):
+                    group = groups[g_idx]
                     X_pred, _, _ = preparation.fetch(data, 
                                                     location, group, 
                                                     epiweek, lag=0, 
@@ -422,22 +420,18 @@ def predict(data, epiweek,
                     pred = model.predict(X_pred.T)
                     pred_l = model_lower.predict(X_pred.T)
                     # add to records
-                    cur_preds[l_idx][idx].append(pred)
-                    cur_preds_upper[l_idx][idx].append(pred_u)
-                    cur_preds_lower[l_idx][idx].append(pred_l)
+                    cur_preds[l_idx][g_idx].append(pred)
+                    cur_preds_upper[l_idx][g_idx].append(pred_u)
+                    cur_preds_lower[l_idx][g_idx].append(pred_l)
             
             for l_idx in range(len(locations)):
-                for idx in range(len(groups)):
-                    # concatenate the results for a better view
-                    cur_preds[l_idx][idx] = np.concatenate(
-                                                cur_preds[l_idx][idx], axis=0).squeeze()
-                    cur_preds_upper[l_idx][idx] = np.concatenate(
-                                                cur_preds_upper[l_idx][idx], axis=0).squeeze()
-                    cur_preds_lower[l_idx][idx] = np.concatenate(
-                                                cur_preds_lower[l_idx][idx], axis=0).squeeze()
-            
-            preds[lg_idx][g_idx] = cur_preds
-            preds_upper[lg_idx][g_idx] = cur_preds_upper
-            preds_lower[lg_idx][g_idx] = cur_preds_lower
-    
+                location = locations[l_idx]
+
+                for g_idx in range(len(groups)):
+                    group = groups[g_idx]
+                    # assign predictions to locations and groups
+                    preds[(location, group)] = cur_preds[l_idx][g_idx][0][0]
+                    preds_upper[(location, group)] = cur_preds_upper[l_idx][g_idx][0][0]
+                    preds_lower[(location, group)] = cur_preds_lower[l_idx][g_idx][0][0]
+
     return preds, preds_upper, preds_lower
