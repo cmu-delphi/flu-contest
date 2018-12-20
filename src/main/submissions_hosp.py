@@ -19,7 +19,7 @@ from ..utils.forecast_type import ForecastType
 SEASON = 2018
 
 
-class Submissions:
+class Submissions_Hosp:
 
   def __init__(self, locations, num_backfill_samples=10000):
     self.past = Baseline(SEASON, locations, num_backfill_samples, ForecastType.HOSP)
@@ -61,7 +61,7 @@ if __name__ == '__main__':
   print(' - Limited locations')
 
   ec_age_groups = ['rate_overall', 'rate_age_0', 'rate_age_1', 'rate_age_2', 'rate_age_3', 'rate_age_4']
-  sub = Submissions(ec_age_groups, 1000)
+  sub = Submissions_Hosp(ec_age_groups, 1000)
   ec = None
   ec = sub.run_epicast(epiweek, 0.001, 0.001)
 
