@@ -168,7 +168,7 @@ class ForecastIO:
       now = datetime.datetime.now()
       week = forecast.epiweek % 100
       args = (week, forecast.team, now.year, now.month, now.day)
-      filename = 'EW%02d-%s-%04d-%02d-%02d.csv' % args
+      filename = 'EW%02d-%s-hosp-%04d-%02d-%02d.csv' % args
 
     # write the csv one row at a time
     with open(filename, 'w', newline='') as f:
