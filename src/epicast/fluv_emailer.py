@@ -198,11 +198,11 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'New Data Available (Deadline: Monday 10 AM)',
+        'subject': 'New Data Available (Deadline: Wednesday 10 AM)',
         'text': '''
         
 Dear %s,
-The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
+The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Christmas holiday, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Wednesday.
 Thank you so much for your support and cooperation!
  
 Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations.  For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge. Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2017-18 season (national and regional forecast), in a crowded field of 30 submissions. It was originally developed by David Farrow as part of his PhD thesis.
@@ -218,11 +218,11 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
+  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Christmas holiday, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Wednesday.
   Thank you so much for your support and cooperation!
 </p><p>
-  Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education campaigns, vaccination campaigns, staffing decisions and resource allocations. For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge.
-  Epicast was the most accurate forecasting systems in CDC's “Predict the Flu” challenge for the 2017-18 season (national and regional forecast), in a crowded field of 30 submissions. It was originally developed by David Farrow as part of his PhD thesis.
+  Accurate forecasting of flu’s spread in different regions is important for timely public alerts, education and vaccination campaigns, staffing decisions and resource allocations. For several years now, CDC has been supporting the development of flu forecasting technology via its annual “Predict the Flu” challenge.
+  Epicast was the most accurate forecasting systems for the 2017-18 season (national and regional forecast) in a crowded field of 30 submissions. 
 </p><p>
   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
 </p>%s<p>
@@ -240,12 +240,12 @@ Happy Forecasting!
 # REMINDERS                                                                    #
 ################################################################################
       'reminders': {
-        'subject': 'Forecasts Needed (Corrected Deadline: Monday 10AM)',
+        'subject': 'Forecasts Needed (Deadline: Wednesday 10AM)',
         'text': '''
 Dear %s,
 
 
-This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
+This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Wednesday. 
 Thank you so much for your support and cooperation!
 
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s.
@@ -259,7 +259,7 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
+  This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Wednesday. 
 Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s.
