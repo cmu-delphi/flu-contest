@@ -156,7 +156,7 @@ class ForecastIO:
   def __save_ili_target(writer, location, target, data):
     def idx_func(index):
       start, end = index / 10, (index + 1) / 10
-      if index == 600: # for 65+ age group, need to do 600 instead of 130
+      if index == 130: # for 65+ age group, need to do 600 instead of 130
         end = 1000 # "NA"
       return start, end
     unit = 'percent'
