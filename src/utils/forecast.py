@@ -37,6 +37,8 @@ class Forecast:
     self.forecasts = {}
     self.ordered_locations = []
     self.season_length = 33
+    if (forecast_type == ForecastType.HOSP):
+        self.season_length = 30
     self.ili_bin_size = 0.1
 
     self.num_ili_bins = 131
