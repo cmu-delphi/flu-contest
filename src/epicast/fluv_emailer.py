@@ -202,7 +202,7 @@ You can find the leaderboards at http://epicast.org/scores.php
         'text': '''
         
 Dear %s,
-The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Christmas holiday, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Wednesday.
+The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to New Year's Day, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Wednesday.
 Thank you so much for your support and cooperation!
  
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
@@ -217,7 +217,7 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to Christmas holiday, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Wednesday.
+  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! Due to New Year's Day, we are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Wednesday.
   Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
