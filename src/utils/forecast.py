@@ -43,7 +43,7 @@ class Forecast:
 
     self.num_ili_bins = 131
     if (forecast_type == ForecastType.HOSP):
-        self.num_ili_bins = 131
+        self.num_ili_bins = 601
 
   def get_metadata(self):
     return (self.season, self.timestamp, self.team, self.epiweek)
