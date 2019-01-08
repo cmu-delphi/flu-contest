@@ -96,7 +96,7 @@ class Locations:
     (False, 'rate_age_1', '5-17 yr'),
     (False, 'rate_age_2', '18-49 yr'),
     (False, 'rate_age_3', '50-64 yr'),
-    (False, 'rate_age_4', '65 + yr'),
+    (False, 'rate_age_4', '65+ yr'),
     (False, 'rate_overall', 'Overall'),
   ):
     __is_region[delphi_name] = __is_region[display_name] = is_region
