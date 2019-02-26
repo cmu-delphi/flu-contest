@@ -377,20 +377,25 @@ if __name__ == '__main__':
     time.sleep(5)
 
   # make it happen
-  submit(args.plotdir, not args.onlyaf, not args.onlyec, args.insane, epiweek, args.store, args.email, args.upload, args.ecround, args.test)
+#   submit(args.plotdir, not args.onlyaf, not args.onlyec, args.insane, epiweek, args.store, args.email, args.upload, args.ecround, args.test)
 
   # mturk, all states
+  print('running Mturk - states')
+  ili_bin_width, week_bin_width = 0.1, 1.0
+  ili_floor, week_floor = 0.001 * (ili_bin_width / 0.5), 0.001 * (week_bin_width / 1.0)
+  print('with ILI-bin-width of %f, probability floor is %f' % (ili_bin_width, ili_floor))
+  print('with week-bin-width of %f, probability floor is %f' % (week_bin_width, week_floor))
   all_states = ['al', 'ak', 'az']
-  sub = Submissions_Mturk(all_states, num_samples)
+  sub = Submissions_Mturk(all_states, 10000)
   ec = sub.run_epicast(epiweek, ili_floor, week_floor)
   print('EC = %s' % ec)
   
   # hospitalization
-  epiweek = EpiDate.today().add_weeks(-2).get_ew()
-  ec_age_groups = ['rate_overall', 'rate_age_0', 'rate_age_1', 'rate_age_2', 'rate_age_3', 'rate_age_4']
-  sub_hosp = Submissions_Hosp(ec_age_groups, 1000)
-  ec_hosp = None
-  ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.001)
-#   ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.13/600)
-  print('Finished! Files are:')
-  print(' -', ec_hosp)
+#   epiweek = EpiDate.today().add_weeks(-2).get_ew()
+#   ec_age_groups = ['rate_overall', 'rate_age_0', 'rate_age_1', 'rate_age_2', 'rate_age_3', 'rate_age_4']
+#   sub_hosp = Submissions_Hosp(ec_age_groups, 1000)
+#   ec_hosp = None
+#   ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.001)
+# #   ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.13/600)
+#   print('Finished! Files are:')
+#   print(' -', ec_hosp)
