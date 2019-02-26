@@ -24,7 +24,7 @@ submissions.
 from ..epicast.fc_epicast_mturk import Epicast
 from ..forecasters.fc_baseline import Baseline
 from ..forecasters.fc_hybrid import Hybrid
-from ..utils.forecast_io import ForecastIO
+from ..utils.forecast_io_mturk import ForecastIO
 from delphi.utils.epidate import EpiDate
 from ..utils.forecast_type import ForecastType
 
