@@ -75,6 +75,7 @@ import mysql.connector
 # first party
 from .submissions import Submissions
 from .submissions_hosp import Submissions_Hosp
+from .submissions_mturk import Submissions_Mturk
 from ..utils import flusight
 from ..utils.forecast import Forecast
 from ..utils.forecast_io import ForecastIO
@@ -378,6 +379,12 @@ if __name__ == '__main__':
   # make it happen
   submit(args.plotdir, not args.onlyaf, not args.onlyec, args.insane, epiweek, args.store, args.email, args.upload, args.ecround, args.test)
 
+  # mturk, all states
+  all_states = ['al', 'ak', 'az']
+  sub = Submissions_Mturk(all_states, num_samples)
+  ec = sub.run_epicast(epiweek, ili_floor, week_floor)
+  print('EC = %s' % ec)
+  
   # hospitalization
   epiweek = EpiDate.today().add_weeks(-2).get_ew()
   ec_age_groups = ['rate_overall', 'rate_age_0', 'rate_age_1', 'rate_age_2', 'rate_age_3', 'rate_age_4']
