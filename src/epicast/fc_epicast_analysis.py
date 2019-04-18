@@ -161,6 +161,8 @@ class Epicast(Forecaster):
 
 
   def fetch_submissions(self, region, epiweek_now):
+    topUsers = self.extractUsers(region, epiweek_now)
+    print(topUsers)
     final_week = flu.join_epiweek(self.test_season + 1, 20)
     self.cur = self.cnx.cursor()
     self.cur.execute("""
@@ -200,9 +202,6 @@ class Epicast(Forecaster):
       u.`id` ASC, f.`epiweek` ASC
     """, (region, epiweek_now, final_week))
     submissions = {}
-
-    topUsers = self.extractUsers(region, epiweek_now)
-    print(topUsers)
     for (user, epiweek, wili) in self.cur:
       if self.users is not None and user not in self.users:
         continue
