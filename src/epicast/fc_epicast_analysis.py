@@ -153,7 +153,7 @@ class Epicast(Forecaster):
               topWorkers[r].append(worker['user_id'])
 
       # get region id from region (which is fluview_name)
-      self.cur.execute("select id from ec_fluv_regions where fluview_name = %d" % region)
+      self.cur.execute("select id from ec_fluv_regions where fluview_name = %s" % region)
       print(self.cur)
       region = self.cur[0]
 
