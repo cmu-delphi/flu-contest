@@ -156,7 +156,9 @@ class Epicast(Forecaster):
       region = "'" + region + "'"
       self.cur.execute("select id from ec_fluv_regions where fluview_name = %s" % region)
       print(self.cur)
-      region = self.cur[0]
+      for id in self.cur:
+        print(id)
+        region = id
 
       return topWorkers[region]
 
