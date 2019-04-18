@@ -91,7 +91,8 @@ import delphi.utils.epiweek as flu
 
 regions = ['nat'] + ['hhs%d' % i for i in range(1, 11)]
 af_locations = regions
-ec_locations = regions + ['dc', 'ga', 'ca']
+# ec_locations = regions + ['dc', 'ga', 'ca']
+ec_locations = ['dc', 'ga', 'ca']
 
 
 def get_expected_issue():
