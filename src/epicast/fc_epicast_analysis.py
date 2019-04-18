@@ -87,7 +87,7 @@ class Epicast(Forecaster):
       epiweek_now = 201910
 
       # Get all user_id
-      cur.execute("select distinct(user_id) from ec_fluv_forecast_mturk where epiweek_now = %d" % epiweek_now)
+      self.cur.execute("select distinct(user_id) from ec_fluv_forecast_mturk where epiweek_now = %d" % epiweek_now)
       num_users = 0
       user_ids = []
       for user_id in cur:
@@ -106,7 +106,7 @@ class Epicast(Forecaster):
           for ew2 in range(epiweek_now + 1, epiweek_now + 5):
               forecast[r][ew2] = {}
 
-      cur.execute("""
+      self.cur.execute("""
           select f.user_id, f.region_id, f.epiweek_now, f.epiweek, f.wili from ec_fluv_forecast_mturk f 
           JOIN ec_fluv_submissions_mturk s ON f.user_id = s.user_id AND f.region_id = s.region_id AND
           f.epiweek_now = s.epiweek_now where f.epiweek_now = %d and f.epiweek <= 201920""" % epiweek_now)
@@ -153,7 +153,7 @@ class Epicast(Forecaster):
               topWorkers[r].append(worker['user_id'])
 
       # get region id from region (which is fluview_name)
-      cur.execute("select id from ec_fluv_regions where fluview_name = %d" % region)
+      self.cur.execute("select id from ec_fluv_regions where fluview_name = %d" % region)
       print(cur)
       region = cur[0]
 
