@@ -84,8 +84,6 @@ class Epicast(Forecaster):
       self.cur = self.cnx.cursor(buffered=True)
 
       # 1. load forecast, with dimensions [location, user, ew2 (+1, 2, 3, 4)]
-      epiweek_now = 201910
-
       # Get all user_id
       self.cur.execute("select distinct(user_id) from ec_fluv_forecast_mturk where epiweek_now = %d" % epiweek_now)
       num_users = 0
