@@ -81,7 +81,7 @@ class Epicast(Forecaster):
 
 
   def extractUsers(self, region, epiweek_now):
-      self.cur = self.cnx.cursor()
+      self.cur = self.cnx.cursor(buffered=True)
 
       # 1. load forecast, with dimensions [location, user, ew2 (+1, 2, 3, 4)]
       epiweek_now = 201910
