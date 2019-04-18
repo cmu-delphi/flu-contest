@@ -90,7 +90,7 @@ class Epicast(Forecaster):
       self.cur.execute("select distinct(user_id) from ec_fluv_forecast_mturk where epiweek_now = %d" % epiweek_now)
       num_users = 0
       user_ids = []
-      for user_id in cur:
+      for user_id in self.cur:
           user_id = user_id[0]
           if user_id not in [45, 312, 539, 670, 145, 410, 411, 1, 2, 3, 4, 5, 6, 7, 8]:
               num_users += 1
@@ -112,7 +112,7 @@ class Epicast(Forecaster):
           f.epiweek_now = s.epiweek_now where f.epiweek_now = %d and f.epiweek <= 201920""" % epiweek_now)
 
       num_predictions = 0
-      for (u, r, ew1, ew2, wili) in cur:
+      for (u, r, ew1, ew2, wili) in self.cur:
           if ew1 == epiweek_now:
               try:
                   forecast[r][ew2][u] = wili
@@ -154,8 +154,8 @@ class Epicast(Forecaster):
 
       # get region id from region (which is fluview_name)
       self.cur.execute("select id from ec_fluv_regions where fluview_name = %d" % region)
-      print(cur)
-      region = cur[0]
+      print(self.cur)
+      region = self.cur[0]
 
       return topWorkers[region]
 
