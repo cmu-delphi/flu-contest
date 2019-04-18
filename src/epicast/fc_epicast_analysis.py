@@ -206,9 +206,11 @@ class Epicast(Forecaster):
     for (user, epiweek, wili) in self.cur:
       if self.users is not None and user not in self.users:
         continue
-      if user not in submissions and user in topUsers:
-        submissions[user] = []
-      submissions[user].append(wili)
+      # only get performance from top users
+      if user in topUsers:
+        if user not in submissions:
+          submissions[user] = []
+        submissions[user].append(wili)
     self.cur.close()
     curves = []
     expected_weeks = flu.delta_epiweeks(epiweek_now, final_week)
