@@ -21,7 +21,7 @@ submissions.
 """
 
 # first party
-from ..epicast.fc_epicast_analysis import Epicast
+from ..epicast.fc_epicast import Epicast
 from ..forecasters.fc_baseline import Baseline
 from ..forecasters.fc_hybrid import Hybrid
 from ..utils.forecast_io import ForecastIO
