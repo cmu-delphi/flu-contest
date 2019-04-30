@@ -385,7 +385,7 @@ if __name__ == '__main__':
   ec_age_groups = ['rate_overall', 'rate_age_0', 'rate_age_1', 'rate_age_2', 'rate_age_3', 'rate_age_4']
   sub_hosp = Submissions_Hosp(ec_age_groups, 1000)
   ec_hosp = None
-#   ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.001)
-  ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.13/600)
+  ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.001)
+#   ec_hosp = sub_hosp.run_epicast(epiweek, 0.001, 0.13/600)
   print('Finished! Files are:')
   print(' -', ec_hosp)
