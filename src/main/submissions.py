@@ -88,8 +88,10 @@ if __name__ == '__main__':
   print(' - Assuming last published wILI on %d' % epiweek)
   print(' - Limited locations')
 
-  regions = ['ga', 'dc', 'ca']
-  sub = Submissions(regions, 10000)
+  states = ['ga', 'dc', 'ca']
+  regions = ['nat', 'hhs1', 'hhs2', 'hhs3', 'hhs4', 'hhs5', 'hhs6', 'hhs7', 'hhs8', 'hhs9', 'hhs10']
+  locations = regions + states
+  sub = Submissions(locations, 10000)
   ec, af = None, None
   ec = sub.run_epicast(epiweek, 0.001, 0.001)
   #af = sub.run_archefilter(epiweek, 0.002, 0.002, num_samples=1000)
