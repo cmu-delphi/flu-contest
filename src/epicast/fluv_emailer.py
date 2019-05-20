@@ -197,38 +197,64 @@ You can find the leaderboards at http://epicast.org/scores.php
 ################################################################################
 # NOTIFICATIONS                                                                #
 ################################################################################
+#       'notifications': {
+#         'subject': 'New Data Available (Deadline: Monday 10 AM)',
+#         'text': '''
+        
+# Dear %s,
+# The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
+# Thank you so much for your support and cooperation!
+ 
+# To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
+# %s
+# Thank you again for your participation, and good luck on your forecasts!
+# Happy Forecasting!
+# -The DELPHI Team
+#         '''%(u[1], u[0], score_text),
+#         'html': '''
+
+
+# <p>
+#   Dear %s,
+# </p><p>
+#   The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
+#   Thank you so much for your support and cooperation!
+# </p><p>
+#   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
+# </p>%s<p>
+#   Thank you again for your participation, and good luck on your forecasts!
+# </p><p>
+#   Happy Forecasting!
+# <br />
+#   -The DELPHI Team
+# </p>
+#         '''%(u[1], u[0], u[0], score_html),
+#       },
+      
       'notifications': {
-        'subject': 'New Data Available (Deadline: Monday 10 AM)',
+        'subject': 'Thank you for your input this year',
         'text': '''
         
 Dear %s,
-The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
-Thank you so much for your support and cooperation!
- 
-To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
-%s
-Thank you again for your participation, and good luck on your forecasts!
-Happy Forecasting!
+This season's forecast competition for influenza and hospitalization has officially ended. We want to thank you for your input and your contribution to flu forecasting; we couldn't have made it without you!
+
+We wish you a happy and healthy year, and see you this September for the next flu season!
+
 -The DELPHI Team
-        '''%(u[1], u[0], score_text),
+        '''%(u[1]),
         'html': '''
 
 
 <p>
   Dear %s,
 </p><p>
-  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
-  Thank you so much for your support and cooperation!
+  This season's forecast competition for influenza and hospitalization has officially ended. We want to thank you for your input and your contribution to flu forecasting; we couldn't have made it without you!
 </p><p>
-  To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
-</p>%s<p>
-  Thank you again for your participation, and good luck on your forecasts!
-</p><p>
-  Happy Forecasting!
-<br />
+  We wish you a happy and healthy year, and see you this September for the next flu season!
+</p>
   -The DELPHI Team
 </p>
-        '''%(u[1], u[0], u[0], score_html),
+        '''%(u[1]),
       },
 
       
