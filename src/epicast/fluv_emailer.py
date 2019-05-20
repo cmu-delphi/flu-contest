@@ -238,7 +238,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 Dear %s,
 This season's forecast competition for influenza and hospitalization has officially ended. We want to thank you for your input and your contribution to flu forecasting; we couldn't have made it without you!
 
-We wish you a happy and healthy year, and see you this September for the next flu season!
+We wish you a happy and healthy year, and see you this September for the next round of flu forecasting!
 
 -The DELPHI Team
         '''%(u[1]),
@@ -250,7 +250,7 @@ We wish you a happy and healthy year, and see you this September for the next fl
 </p><p>
   This season's forecast competition for influenza and hospitalization has officially ended. We want to thank you for your input and your contribution to flu forecasting; we couldn't have made it without you!
 </p><p>
-  We wish you a happy and healthy year, and see you this September for the next flu season!
+  We wish you a happy and healthy year, and see you this September for the next round of flu forecasting!
 </p>
   -The DELPHI Team
 </p>
