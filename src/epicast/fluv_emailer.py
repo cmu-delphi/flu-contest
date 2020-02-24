@@ -198,11 +198,11 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'Urgent: Deadline Updated to 6PM today',
+        'subject': 'Urgent: Deadline Updated to 9PM today',
         'text': '''
         
 Dear %s,
-Due to an issue in our system, we are extending submission deadline of this week's forecast to 6PM today. Thank you for your patience and understanding.
+Due to an issue in our system, we are extending submission deadline of this week's forecast to 9PM today. Thank you for your patience and understanding.
  
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
 %s
@@ -215,7 +215,7 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  Due to an issue in our system, we are extending submission deadline of this week's forecast to 6PM today. Thank you for your patience and understanding.
+  Due to an issue in our system, we are extending submission deadline of this week's forecast to 9PM today. Thank you for your patience and understanding.
 </p><p>
   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
 </p>%s<p>
