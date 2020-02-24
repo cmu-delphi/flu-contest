@@ -198,11 +198,12 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': 'Urgent: Deadline Updated to 6PM today',
+        'subject': '[Epicast] New Data Available (Deadline: Monday 10 AM)',
         'text': '''
-        
+
 Dear %s,
-Due to an issue in our system, we are extending submission deadline of this week's forecast to 6PM today. Thank you for your patience and understanding.
+The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
+Thank you so much for your support and cooperation!
  
 To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
 %s
@@ -215,7 +216,8 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  Due to an issue in our system, we are extending submission deadline of this week's forecast to 6PM today. Thank you for your patience and understanding.
+  The CDC has released another week of flu surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
+  Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
 </p>%s<p>
