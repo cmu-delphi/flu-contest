@@ -198,7 +198,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 # NOTIFICATIONS                                                                #
 ################################################################################
       'notifications': {
-        'subject': '[Epicast] New Data Available (Deadline: Monday 10 AM)',
+        'subject': 'New Data Available (Deadline: Monday 10 AM)',
         'text': '''
 
 Dear %s,
