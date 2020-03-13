@@ -190,7 +190,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 # ALERTS                                                                       #
 ################################################################################
       'alerts': {
-        'subject': 'Epicast Needs Your Help',
+        'subject': 'Crowdcast Needs Your Help',
         'text': '''Dear %s...'''%(u[1]),
         'html': '''Dear %s...'''%(u[1]),
       },
