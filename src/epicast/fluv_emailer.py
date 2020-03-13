@@ -207,12 +207,12 @@ Due to the coronavirus pandemic, and at the request of CDC, we will be continuin
 
 One big change to expect is that a pandemic such as COVID-19 tends to be much larger than a typical flu epidemic wave, and can occur at any time of the year.  Another thing to expect is that strong mitigation efforts may dampen the pandemic wave.
 
-In the coming weeks, we will change the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
+Starting this week, we will change the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
 
 The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
 Thank you so much for your support and cooperation!
  
-To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s
+To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
 %s
 Thank you again for your participation, and good luck on your forecasts!
 Happy Forecasting!
@@ -227,12 +227,12 @@ Due to the coronavirus pandemic, and at the request of CDC, we will be continuin
 </p><p>
 One big change to expect is that a pandemic such as COVID-19 tends to be much larger than a typical flu epidemic wave, and can occur at any time of the year.  Another thing to expect is that strong mitigation efforts may dampen the pandemic wave.
 </p><p>
-In the coming weeks, we will change the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
+Starting this week, we will change the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
 </p><p>
   The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
   Thank you so much for your support and cooperation!
 </p><p>
-  To login and submit your forecasts, click <a href="http://epicast.org/launch.php?user=%s">here</a> or visit http://epicast.org and enter your User ID: %s
+  To login and submit your forecasts, click <a href="https://delphi.cmu.edu/epicast/launch.php?user=%s">here</a> or visit https://delphi.cmu.edu/crowdcast/v and enter your User ID: %s
 </p>%s<p>
   Thank you again for your participation, and good luck on your forecasts!
 </p><p>
@@ -254,10 +254,10 @@ In the coming weeks, we will change the Crowdcast interface to provide you with 
 Dear %s,
 
 
-This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
-Thank you so much for your support and cooperation!
+This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by 10:00AM (ET) on Monday. Thank you so much for your support and cooperation!
 
-To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s.
+
+To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast and enter your User ID: %s.
 
 
 Happy Forecasting!
@@ -268,10 +268,9 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  This is just a friendly reminder that your flu forecasts are due by 10:00AM (ET) on Monday. 
-Thank you so much for your support and cooperation!
+  This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by 10:00AM (ET) on Monday. Thank you so much for your support and cooperation!
 </p><p>
-  To login and submit your forecasts, visit http://epicast.org and enter your User ID: %s.
+  To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast and enter your User ID: %s.
 </p><p>
   Happy Forecasting!
   <br />
