@@ -203,6 +203,8 @@ You can find the leaderboards at http://epicast.org/scores.php
 
 Dear %s,
 
+*** The following few paragraphs are new and important – please read them carefully ***
+
 Due to the coronavirus pandemic, and at the request of CDC, we will be continuing our Epicast activity (now renamed ‘Crowdcast’) for as long as needed.  We ask you to continue to forecast exactly the same thing you have been forecasting until now -- the prevalence of influenza-like- illness (ILI).  In the coming months, as flu and other winter respiratory illnesses recede, the majority of ILI is expected to be attributable to COVID-19.
 
 One big change to expect is that a pandemic such as COVID-19 tends to be much larger than a typical flu epidemic wave, and can occur at any time of the year.  Another thing to expect is that strong mitigation efforts may dampen the pandemic wave.
@@ -222,6 +224,8 @@ Happy Forecasting!
 
 <p>
   Dear %s,
+</p><p>
+<b> *** The following few paragraphs are new and important – please read them carefully *** </b>
 </p><p>
 Due to the coronavirus pandemic, and at the request of CDC, we will be continuing our Epicast activity (now renamed ‘Crowdcast’) for as long as needed.  We ask you to continue to forecast exactly the same thing you have been forecasting until now -- the prevalence of influenza-like- illness (ILI).  In the coming months, as flu and other winter respiratory illnesses recede, the majority of ILI is expected to be attributable to COVID-19.
 </p><p>
@@ -298,7 +302,7 @@ Unsubscribe: http://epicast.org?preferences.php?user=%s
     if args.print:
       print('%s -> %s\n%s'%(subject, to, emails[args.type]['text']), True)
     else:
-      sql = "INSERT INTO automation.email_queue (`from`, `to`, `subject`, `body`) VALUES ('%s', '%s', '[Epicast] %s', '%s')"%(secrets.flucontest.email_epicast, to, subject, body)
+      sql = "INSERT INTO automation.email_queue (`from`, `to`, `subject`, `body`) VALUES ('%s', '%s', '[Crowdcast] %s', '%s')"%(secrets.flucontest.email_epicast, to, subject, body)
       execute_sql(cur, sql)
   if not args.print:
     sql = "CALL automation.RunStep(2)"
