@@ -253,12 +253,12 @@ Starting this week, we will change the Crowdcast interface to provide you with m
 # REMINDERS                                                                    #
 ################################################################################
       'reminders': {
-        'subject': 'Forecasts Needed (Deadline: Monday 10AM)',
+        'subject': 'Forecasts Needed (Correction: Deadline is Thursday 10AM)',
         'text': '''
 Dear %s,
 
 
-This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by 10:00AM (ET) on Monday. Thank you so much for your support and cooperation!
+This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by <b> 10:00AM (ET) on Thursday</b>. Thank you so much for your support and cooperation!
 
 
 To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast and enter your User ID: %s.
@@ -272,7 +272,7 @@ Happy Forecasting!
 <p>
   Dear %s,
 </p><p>
-  This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by 10:00AM (ET) on Monday. Thank you so much for your support and cooperation!
+  This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by <b> 10:00AM (ET) on Thursday</b>. Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast and enter your User ID: %s.
 </p><p>
