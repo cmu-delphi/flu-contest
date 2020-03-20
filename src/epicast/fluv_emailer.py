@@ -203,12 +203,6 @@ You can find the leaderboards at http://epicast.org/scores.php
 
 Dear %s,
 
-Due to the coronavirus pandemic, and at the request of CDC, we will be continuing our Epicast activity (now renamed ‘Crowdcast’) for as long as needed.  We ask you to continue to forecast exactly the same thing you have been forecasting until now -- the prevalence of influenza-like- illness (ILI).  In the coming months, as flu and other winter respiratory illnesses recede, the majority of ILI is expected to be attributable to COVID-19.
-
-One big change to expect is that a pandemic such as COVID-19 tends to be much larger than a typical flu epidemic wave, and can occur at any time of the year.  Another thing to expect is that strong mitigation efforts may dampen the pandemic wave.
-
-Starting this week, we will change the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
-
 The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Thursday.
 Thank you so much for your support and cooperation!
  
@@ -222,12 +216,6 @@ Happy Forecasting!
 
 <p>
   Dear %s,
-</p><p>
-Due to the coronavirus pandemic, and at the request of CDC, we will be continuing our Epicast activity (now renamed ‘Crowdcast’) for as long as needed.  We ask you to continue to forecast exactly the same thing you have been forecasting until now -- the prevalence of influenza-like- illness (ILI).  In the coming months, as flu and other winter respiratory illnesses recede, the majority of ILI is expected to be attributable to COVID-19.
-</p><p>
-One big change to expect is that a pandemic such as COVID-19 tends to be much larger than a typical flu epidemic wave, and can occur at any time of the year.  Another thing to expect is that strong mitigation efforts may dampen the pandemic wave.
-</p><p>
-Starting this week, we will change the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
 </p><p>
   The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
   Thank you so much for your support and cooperation!
