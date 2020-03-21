@@ -231,7 +231,7 @@ One big change to expect is that a pandemic such as COVID-19 tends to be much la
 
 We have changed the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
 
-The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Thursday.
+The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Thursday.
 Thank you so much for your support and cooperation!
  
 To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
@@ -253,7 +253,7 @@ One big change to expect is that a pandemic such as COVID-19 tends to be much la
 </p><p>
 We have changed the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
 </p><p>
-  The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of flu forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
+  The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
   Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, click <a href="https://delphi.cmu.edu/epicast/launch.php?user=%s">here</a> or visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
