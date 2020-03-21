@@ -162,6 +162,7 @@ if __name__ == '__main__':
 
   #Send the emails
   for u in users:
+    print(u, "********************")
     s = get_scores(cur, u)
     score_text = ''
     score_html = ''
