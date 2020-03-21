@@ -141,6 +141,8 @@ if __name__ == '__main__':
   if email_type == 'alerts':
     email_type = 'notifications'
   users = get_users(cur, 'email_%s' % (email_type), '1') - get_users(cur, '_debug', '1')
+  # Slicing users into batches to send notification emails.
+  users = users[:300]
   print('%d users selected to receive email %s' % (len(users), args.type), True)
   if args.type == 'alerts':
     #users = users - get_users(cur, '_delphi', '0')
