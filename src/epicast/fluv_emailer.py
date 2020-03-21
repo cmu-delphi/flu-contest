@@ -158,9 +158,8 @@ if __name__ == '__main__':
     print('test mode - users filtered to %d' % (len(users)), True)
   if args.force:
     users = set([u for u in users if u[0] != secrets.flucontest.debug_userid]) | set([(secrets.flucontest.debug_userid, 'Debug User', secrets.flucontest.email_maintainer)])
-    # print('force mode - users filtered to %d' % (len(users)), True)
-    print('force mode')
-    print(users)
+    print('force mode - users filtered to %d' % (len(users)), True)
+    print(users, True)
 
   #Send the emails
   for u in users:
