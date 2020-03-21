@@ -159,9 +159,9 @@ if __name__ == '__main__':
   if args.force:
     users = set([u for u in users if u[0] != secrets.flucontest.debug_userid]) | set([(secrets.flucontest.debug_userid, 'Debug User', secrets.flucontest.email_maintainer)])
     print('force mode - users filtered to %d' % (len(users)), True)
+    print(users)
+    print("-----------------")
 
-  print(users)
-  print("-----------------")
   #Send the emails
   for u in users:
     s = get_scores(cur, u)
