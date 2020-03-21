@@ -144,6 +144,7 @@ if __name__ == '__main__':
   
   
   # Slicing users into batches to send notification emails.
+  users = list(users)
   user1, user2, user3, user4, user5 = [], [], [], [], []
   for i in range(len(users)):
     if i < 300:
