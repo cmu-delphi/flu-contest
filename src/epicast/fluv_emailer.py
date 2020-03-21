@@ -158,7 +158,7 @@ if __name__ == '__main__':
     else:
       user5.append(users[i])
   user1, user2, user3, user4, user5 = set(user1), set(user2), set(user3), set(user4), set(user5)
-  users = user1
+  users = user2
   
   print('%d users selected to receive email %s' % (len(users), args.type), True)
   if args.type == 'alerts':
