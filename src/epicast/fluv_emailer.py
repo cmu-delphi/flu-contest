@@ -147,13 +147,13 @@ if __name__ == '__main__':
   users = list(users)
   user1, user2, user3, user4, user5 = [], [], [], [], []
   for i in range(len(users)):
-    if i < 300:
+    if i < 400:
       user1.append(users[i])
-    elif i < 600:
+    elif i < 800:
       user2.append(users[i])
-    elif i < 900:
-      user3.append(users[i])
     elif i < 1200:
+      user3.append(users[i])
+    elif i < 1600:
       user4.append(users[i])
     else:
       user5.append(users[i])
