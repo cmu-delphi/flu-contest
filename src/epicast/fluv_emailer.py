@@ -99,7 +99,7 @@ def get_scores(cur, user):
 
 #Get user forecast info
 def already_submitted(cur, user):
-  defaultNumRegion = 14
+  defaultNumRegion = 11
   sql = "SELECT count(1) FROM ec_fluv_users u JOIN ec_fluv_submissions s ON s.`user_id` = u.`id` WHERE u.`hash` LIKE '%s%%' AND s.`epiweek_now` = (SELECT max(epiweek) FROM epidata.fluview)"%(user[0])
   execute_sql(cur, sql)
   num = 0
