@@ -198,21 +198,9 @@ def main(args, connector_impl=mysql.connector):
   users = get_users(cur, 'email_%s' % (email_type), '1') - get_users(cur, '_debug', '1')
 
   # Slicing users into batches to send notification emails.
-  users = sorted(users)
-  user1, user2, user3, user4, user5 = [], [], [], [], []
-  for i in range(len(users)):
-    if i < 400:
-      user1.append(users[i])
-    elif i < 800:
-      user2.append(users[i])
-    elif i < 1200:
-      user3.append(users[i])
-    elif i < 1600:
-      user4.append(users[i])
-    else:
-      user5.append(users[i])
-  user1, user2, user3, user4, user5 = set(user1), set(user2), set(user3), set(user4), set(user5)
-  users = user1
+  total_batches = 5
+  current_batch = 0
+  users = set(sorted(users)[current_batch::total_batches])
 
   log('%d users selected to receive email %s' % (len(users), args.type), True)
   if args.type == 'alerts':
