@@ -195,15 +195,28 @@ Note: To be listed on the leaderboards, simply enter your initials on the prefer
 
 You can find the leaderboards at http://epicast.org/scores.php
 ''' % (s[0], s[1], s[2], s[3])
+      
+      
+#       score_html = '''
+# <p>
+#   Your forecast last week received a score of: %d (<i>ranked #%d</i>)
+#   <br />
+#   Your overall score is: %d (<i>ranked #%d</i>)
+#   <br />
+#   Note: To be listed on the <a href="http://epicast.org/scores.php">leaderboards</a>, simply enter your initials on the preferences page <a href="http://epicast.org/preferences.php?user=%s">here</a>.
+# </p>
+#       ''' % (s[0], s[1], s[2], s[3], u[0])
+      
       score_html = '''
 <p>
-  Your forecast last week received a score of: %d (<i>ranked #%d</i>)
-  <br />
   Your overall score is: %d (<i>ranked #%d</i>)
   <br />
   Note: To be listed on the <a href="http://epicast.org/scores.php">leaderboards</a>, simply enter your initials on the preferences page <a href="http://epicast.org/preferences.php?user=%s">here</a>.
 </p>
-      ''' % (s[0], s[1], s[2], s[3], u[0])
+      ''' % (s[1], s[2], s[3], u[0])
+      
+      
+      
     #Email contents
     emails = {
 ################################################################################
