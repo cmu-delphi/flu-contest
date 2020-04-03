@@ -166,26 +166,30 @@ def get_deadline_day_name(cur):
   return name
 
 
-def main(args):
+def connect_to_database(connector_impl):
+  """Connect to the database and return a cursor."""
+
+  u, p = secrets.db.epi
+  return connector_impl.connect(user=u, password=p, database='epicast2')
+
+
+def main(args, connector_impl=mysql.connector):
   """Generate and submit various emails to epicast participants."""
 
   #Verbosity-dependent print
-  _print = print
-
-  def print(str, force=False):
+  def log(str, force=False):
     if force or args.verbose:
-      _print(str)
+      print(str)
 
   #DB connection
-  print('Connecting to the database')
-  u, p = secrets.db.epi
-  cnx = mysql.connector.connect(user=u, password=p, database='epicast2')
+  log('Connecting to the database')
+  cnx = connect_to_database(connector_impl)
   cur = cnx.cursor()
-  print('Connected successfully')
+  log('Connected successfully')
 
   #Get deadline
   deadline_day = get_deadline_day_name(cur)
-  print('deadline is this coming %s' % deadline_day)
+  log('deadline is this coming %s' % deadline_day)
 
   #Build the list of recipients
   email_type = args.type
@@ -210,25 +214,25 @@ def main(args):
   user1, user2, user3, user4, user5 = set(user1), set(user2), set(user3), set(user4), set(user5)
   users = user1
 
-  print('%d users selected to receive email %s' % (len(users), args.type), True)
+  log('%d users selected to receive email %s' % (len(users), args.type), True)
   if args.type == 'alerts':
     #users = users - get_users(cur, '_delphi', '0')
-    #print('%d of them are delphi members' % (len(users)), True)
-    print('everyone in ec_fluv_users gets invited')
+    #log('%d of them are delphi members' % (len(users)), True)
+    log('everyone in ec_fluv_users gets invited')
   if args.type == 'reminders':
     temp = []
     for u in users:
       if not already_submitted(cur, u):
         temp.append(u)
     users = set(temp)
-    print('%d of them need to be reminded' % (len(users)), True)
+    log('%d of them need to be reminded' % (len(users)), True)
   if args.test:
     users = set([u for u in users if u[0] == secrets.flucontest.debug_userid])
-    print('test mode - users filtered to %d' % (len(users)), True)
+    log('test mode - users filtered to %d' % (len(users)), True)
   if args.force:
     users = set([u for u in users if u[0] != secrets.flucontest.debug_userid]) | set([(secrets.flucontest.debug_userid, 'Debug User', secrets.flucontest.email_maintainer)])
-    print('force mode - users filtered to %d' % (len(users)), True)
-    print(users, True)
+    log('force mode - users filtered to %d' % (len(users)), True)
+    log(users, True)
 
   #Send the emails
   for u in users:
@@ -370,7 +374,7 @@ Unsubscribe: http://epicast.org?preferences.php?user=%s
     ''' % (u[0]) + '</body></html>'
     to, subject, body = u[2], emails[args.type]['subject'], emailer.encode(emails[args.type])
     if args.print:
-      print('%s -> %s\n%s' % (subject, to, emails[args.type]['text']), True)
+      log('%s -> %s\n%s' % (subject, to, emails[args.type]['text']), True)
     else:
       sql = "INSERT INTO automation.email_queue (`from`, `to`, `subject`, `body`) VALUES ('%s', '%s', '[Crowdcast] %s', '%s')" % (secrets.flucontest.email_epicast, to, subject, body)
       execute_sql(cur, sql)
@@ -382,7 +386,7 @@ Unsubscribe: http://epicast.org?preferences.php?user=%s
   cnx.commit()
   cur.close()
   cnx.close()
-  print('Done!', True)
+  log('Done!', True)
 
 
 if __name__ == '__main__':
