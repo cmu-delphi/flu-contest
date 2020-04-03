@@ -66,14 +66,15 @@ import delphi.operations.emailer as emailer
 import delphi.operations.secrets as secrets
 
 
-#Args and usage
-parser = argparse.ArgumentParser()
-parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False, help="show extra output")
-parser.add_argument('-t', '--test', action='store_const', const=True, default=False, help="only email myself")
-parser.add_argument('-p', '--print', action='store_const', const=True, default=False, help="print email to stdout, don't send")
-parser.add_argument('-f', '--force', action='store_const', const=True, default=False, help="force match on myself")
-parser.add_argument('type', choices=['alerts', 'notifications', 'reminders'], help="email type")
-args = parser.parse_args()
+def parse_args():
+  #Args and usage
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False, help="show extra output")
+  parser.add_argument('-t', '--test', action='store_const', const=True, default=False, help="only email myself")
+  parser.add_argument('-p', '--print', action='store_const', const=True, default=False, help="print email to stdout, don't send")
+  parser.add_argument('-f', '--force', action='store_const', const=True, default=False, help="force match on myself")
+  parser.add_argument('type', choices=['alerts', 'notifications', 'reminders'], help="email type")
+  return parser.parse_args()
 
 #Execute and print SQL
 def execute_sql(cur, sql):
@@ -118,7 +119,8 @@ def get_deadline_day_name(cur):
     raise Exception('couldnt get name of deadline day')
   return name
 
-if __name__ == '__main__':
+
+def main(args):
   #Verbosity-dependent print
   _print = print
   def print(str, force=False):
@@ -141,8 +143,8 @@ if __name__ == '__main__':
   if email_type == 'alerts':
     email_type = 'notifications'
   users = get_users(cur, 'email_%s' % (email_type), '1') - get_users(cur, '_debug', '1')
-  
-  
+
+
   # Slicing users into batches to send notification emails.
   users = sorted(users)
   user1, user2, user3, user4, user5 = [], [], [], [], []
@@ -159,7 +161,7 @@ if __name__ == '__main__':
       user5.append(users[i])
   user1, user2, user3, user4, user5 = set(user1), set(user2), set(user3), set(user4), set(user5)
   users = user1
-  
+
   print('%d users selected to receive email %s' % (len(users), args.type), True)
   if args.type == 'alerts':
     #users = users - get_users(cur, '_delphi', '0')
@@ -233,7 +235,7 @@ We have changed the Crowdcast interface to provide you with more COVID-related a
 
 The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Thursday.
 Thank you so much for your support and cooperation!
- 
+
 To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
 %s
 Thank you again for your participation, and good luck on your forecasts!
@@ -253,7 +255,7 @@ One big change to expect is that a pandemic such as COVID-19 tends to be much la
 </p><p>
 We have changed the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
 </p><p>
-  The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.  
+  The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
   Thank you so much for your support and cooperation!
 </p><p>
   To login and submit your forecasts, click <a href="https://delphi.cmu.edu/epicast/launch.php?user=%s">here</a> or visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
@@ -266,9 +268,9 @@ We have changed the Crowdcast interface to provide you with more COVID-related a
 </p>
         '''%(u[1], u[0], u[0], score_html),
       },
-     
 
-      
+
+
 ################################################################################
 # REMINDERS                                                                    #
 ################################################################################
@@ -333,3 +335,7 @@ Unsubscribe: http://epicast.org?preferences.php?user=%s
   cur.close()
   cnx.close()
   print('Done!', True)
+
+
+if __name__ == '__main__':
+  main(parse_args())
