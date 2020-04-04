@@ -199,7 +199,7 @@ def main(args, connector_impl=mysql.connector):
 
   # Slicing users into batches to send notification emails.
   total_batches = 5
-  current_batch = 3
+  current_batch = 4
   users = set(sorted(users)[current_batch::total_batches])
 
   log('%d users selected to receive email %s' % (len(users), args.type), True)
