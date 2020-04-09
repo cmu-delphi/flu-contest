@@ -228,15 +228,22 @@ def main(args, connector_impl=mysql.connector):
     score_text = ''
     score_html = ''
     if s[0] > 0:
-      score_text = '''
-Your forecast last week received a score of: %d (ranked #%d)
+#       score_text = '''
+# Your forecast last week received a score of: %d (ranked #%d)
 
+# Your overall score is: %d (ranked #%d)
+
+# Note: To be listed on the leaderboards, simply enter your initials on the preferences page at http://epicast.org/preferences.php
+
+# You can find the leaderboards at http://epicast.org/scores.php
+# ''' % (s[0], s[1], s[2], s[3])
+      score_text = '''
 Your overall score is: %d (ranked #%d)
 
-Note: To be listed on the leaderboards, simply enter your initials on the preferences page at http://epicast.org/preferences.php
+Note: To be listed on the leaderboards, simply enter your initials on the preferences page at https://delphi.cmu.edu/crowdcast/preferences.php?user=%s
 
-You can find the leaderboards at http://epicast.org/scores.php
-''' % (s[0], s[1], s[2], s[3])
+You can find the leaderboards at https://delphi.cmu.edu/crowdcast/scores.php
+''' % (s[2], s[3], u[0])
 
 #       score_html = '''
 # <p>
@@ -252,7 +259,7 @@ You can find the leaderboards at http://epicast.org/scores.php
 <p>
   Your overall score is: %d (<i>ranked #%d</i>)
   <br />
-  Note: To be listed on the <a href="http://epicast.org/scores.php">leaderboards</a>, simply enter your initials on the preferences page <a href="http://epicast.org/preferences.php?user=%s">here</a>.
+  Note: To be listed on the <a href="https://delphi.cmu.edu/crowdcast/scores.php">leaderboards</a>, simply enter your initials on the preferences page <a href="https://delphi.cmu.edu/crowdcast/preferences.php?user=%s">here</a>.
 </p>
       ''' % (s[2], s[3], u[0])
 
@@ -285,7 +292,7 @@ One big change to expect is that a pandemic such as COVID-19 tends to be much la
 
 We have changed the Crowdcast interface to provide you with more COVID-related and pandemic-related information and links.
 
-The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Thursday.
+The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
 Thank you so much for your support and cooperation!
 
 To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
@@ -310,7 +317,7 @@ We have changed the Crowdcast interface to provide you with more COVID-related a
   The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
   Thank you so much for your support and cooperation!
 </p><p>
-  To login and submit your forecasts, click <a href="https://delphi.cmu.edu/epicast/launch.php?user=%s">here</a> or visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
+  To login and submit your forecasts, click <a href="https://delphi.cmu.edu/crowdcast/launch.php?user=%s">here</a> or visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
 </p>%s<p>
   Thank you again for your participation, and good luck on your forecasts!
 </p><p>
@@ -360,14 +367,14 @@ Happy Forecasting!
 
 [This is an automated message. To edit your email preferences or to stop receiving these emails, follow the unsubscribe link below.]
 
-Unsubscribe: http://epicast.org?preferences.php?user=%s
+Unsubscribe: https://delphi.cmu.edu/crowdcast/preferences.php?user=%s
     ''' % (u[0])
     emails[args.type]['html'] = '<html><body>' + emails[args.type]['html'] + '''
 <hr />
 <p style="color: #666; font-size: 0.8em;">
   [This is an automated message. To edit your email preferences or to stop receiving these emails, click the unsubscribe link below.]
   <br />
-  <a href="http://epicast.org/preferences.php?user=%s">Unsubscribe</a>
+  <a href="https://delphi.cmu.edu/crowdcast/preferences.php?user=%s">Unsubscribe</a>
 </p>
     ''' % (u[0]) + '</body></html>'
     to, subject, body = u[2], emails[args.type]['subject'], emailer.encode(emails[args.type])
