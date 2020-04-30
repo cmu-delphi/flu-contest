@@ -4,6 +4,19 @@
 import delphi.flu_contest.covid.constants as Constants
 
 
+# we temporarily want to exclude the following targets from forecasts
+EXCLUDED_TARGETS = {
+  'peak_week',
+  'peak_wili',
+  '3wk_wili',
+  '4wk_wili',
+  '5wk_wili',
+  '6wk_wili',
+  'offset_week',
+  'offset_happened',
+}
+
+
 class ForecastWriter:
 
   @staticmethod
@@ -22,6 +35,10 @@ class ForecastWriter:
   def write_common_targets(f, forecasts, location):
     location_name = ForecastWriter.get_location_name(location)
     for target in Constants.COMMON_TARGETS:
+
+      if target in EXCLUDED_TARGETS:
+        print('NOTE: not writing target', target)
+
       target_name = Constants.TARGET_NAMES[target]
 
       # point prediction
@@ -61,35 +78,41 @@ class ForecastWriter:
     location_name = ForecastWriter.get_location_name(location)
 
     target = 'offset_week'
-    target_name = Constants.TARGET_NAMES[target]
+    if target in EXCLUDED_TARGETS:
+      print('NOTE: not writing target', target)
+    else:
+      target_name = Constants.TARGET_NAMES[target]
 
-    # // copy-pasta
+      # // copy-pasta
 
-    # point prediction
-    value = forecasts[location]['points'][target]
-    wk = 10 + value
-    if wk < 10 or wk > 35 or round(wk) != wk:
-      raise Exception('invalid week')
-    value_str = '2020-ew%02d' % wk
-    f.write('%s,%s,point,NA,%s\n' % (location_name, target_name, value_str))
+      # point prediction
+      value = forecasts[location]['points'][target]
+      wk = 10 + value
+      if wk < 10 or wk > 35 or round(wk) != wk:
+        raise Exception('invalid week')
+      value_str = '2020-ew%02d' % wk
+      f.write('%s,%s,point,NA,%s\n' % (location_name, target_name, value_str))
 
-    bins = forecasts[location]['bins'][target]
-    if target.endswith('week'):
-      # distribution spans 2020w10--2020w35
-      for i, week in enumerate(range(10, 36)):
-        week_name = '2020-ew%02d' % week
-        value_str = '%f' % bins[i]
-        args = (location_name, target_name, week_name, value_str)
-        f.write('%s,%s,bin,%s,%s\n' % args)
+      bins = forecasts[location]['bins'][target]
+      if target.endswith('week'):
+        # distribution spans 2020w10--2020w35
+        for i, week in enumerate(range(10, 36)):
+          week_name = '2020-ew%02d' % week
+          value_str = '%f' % bins[i]
+          args = (location_name, target_name, week_name, value_str)
+          f.write('%s,%s,bin,%s,%s\n' % args)
 
-    # copy-pasta //
+      # copy-pasta //
 
     target = 'offset_happened'
-    target_name = Constants.TARGET_NAMES[target]
+    if target in EXCLUDED_TARGETS:
+      print('NOTE: not writing target', target)
+    else:
+      target_name = Constants.TARGET_NAMES[target]
 
-    # no point prediction, and single bin (of two total)
-    value_str = '%f' % forecasts[location]['bins'][target]
-    f.write('%s,%s,bin,true,%s\n' % (location_name, target_name, value_str))
+      # no point prediction, and single bin (of two total)
+      value_str = '%f' % forecasts[location]['bins'][target]
+      f.write('%s,%s,bin,true,%s\n' % (location_name, target_name, value_str))
 
   @staticmethod
   def generate_csv(forecasts, epiweek):
