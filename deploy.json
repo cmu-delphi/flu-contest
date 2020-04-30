@@ -18,6 +18,15 @@
       "add-header-comment": true
     },
 
+    "// epicast for COVID-19",
+    {
+      "type": "move",
+      "src": "src/covid/",
+      "dst": "[[package]]/covid/",
+      "match": "^.*\\.py$",
+      "add-header-comment": true
+    },
+
     "// forecast generation",
     {
       "type": "move",
