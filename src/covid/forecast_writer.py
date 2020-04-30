@@ -37,7 +37,7 @@ class ForecastWriter:
     for target in Constants.COMMON_TARGETS:
 
       if target in EXCLUDED_TARGETS:
-        print('NOTE: not writing target', target)
+        continue
 
       target_name = Constants.TARGET_NAMES[target]
 
@@ -78,9 +78,7 @@ class ForecastWriter:
     location_name = ForecastWriter.get_location_name(location)
 
     target = 'offset_week'
-    if target in EXCLUDED_TARGETS:
-      print('NOTE: not writing target', target)
-    else:
+    if target not in EXCLUDED_TARGETS:
       target_name = Constants.TARGET_NAMES[target]
 
       # // copy-pasta
@@ -105,9 +103,7 @@ class ForecastWriter:
       # copy-pasta //
 
     target = 'offset_happened'
-    if target in EXCLUDED_TARGETS:
-      print('NOTE: not writing target', target)
-    else:
+    if target not in EXCLUDED_TARGETS:
       target_name = Constants.TARGET_NAMES[target]
 
       # no point prediction, and single bin (of two total)
@@ -116,6 +112,9 @@ class ForecastWriter:
 
   @staticmethod
   def generate_csv(forecasts, epiweek):
+    for target in sorted(EXCLUDED_TARGETS):
+      print('NOTE: excluding target', target)
+
     # write the files (rename later if you want)
     filename = 'covid-epicast-%d-regional.csv' % epiweek
     with open(filename, 'w') as f:
