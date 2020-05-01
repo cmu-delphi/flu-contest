@@ -47,6 +47,7 @@ import mysql.connector
 
 # first party
 from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.operations.emailer as emailer
 import delphi.operations.secrets as secrets
 from delphi.utils.epiweek import *
 
@@ -118,8 +119,15 @@ def main():
       execute_sql(cur, 'ALTER TABLE ec_fluv_history_temp RENAME TO ec_fluv_history_stage')
       execute_sql(cur, 'TRUNCATE TABLE ec_fluv_history_stage')
       # Queue an email to myself
-      execute_sql(cur, "INSERT INTO automation.email_queue (`from`, `to`, `subject`, `body`) VALUES ('%s', '%s', '[DELPHI] New FluView Data', 'Another week of FluView data is now available - Happy forecasting!')" % (secrets.flucontest.email_epicast, secrets.flucontest.email_maintainer))
-      execute_sql(cur, 'CALL automation.RunStep(2)')
+      text = (
+        'Another week of FluView data is now available - '
+        'Happy forecasting!'
+      )
+      emailer.queue_email(
+          to=secrets.flucontest.email_maintainer,
+          subject='[DELPHI] New FluView Data',
+          text=text)
+      emailer.call_emailer()
       # Queue the score updater
       execute_sql(cur, 'CALL automation.RunStep(8)')
       # Queue the notification emails

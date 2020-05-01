@@ -1,56 +1,7 @@
-"""
-===============
-=== Purpose ===
-===============
-
-Sends emails to Epicast-FLUV users:
-  `alerts`: custom, one-time `notifications`-type email for a manual user group
-  `notifications`: for all users, says that the CDC published new data
-  `reminders`: for users with missing forecasts, a reminder that the deadline
-    is soon
+"""Sends emails to Epicast-FLUV users.
 
 Individual user preferences are respected; it won't email people who don't want
 to be emailed.
-
-
-=================
-=== Changelog ===
-=================
-
-2016-12-14
-  + use secrets
-2016-01-08
-  * Further reverted "notifications" for normal schedule
-2016-01-07
-  * Reverted "notifications" for normal schedule
-2015-12-21
-  + Use database to get name of day of upcoming deadline
-  * Changed "notifications" for the late release of 2015w50/51
-2015-11-30
-  * Changed and reverted "notifications" for the late release of 2015w46
-2015-11-13
-  * Only include score info in "notifications" if score is positive
-2015-11-06
-  * Updated "alerts" to ask last year's users to join again this year
-2015-10-30
-  * Updated documentation
-  * Use database `epicast2`
-  * Updated all scripts to use ET instead of EDT
-  * Changed the "alerts" script to be a delphi-only notification for 2015w42
-  - Unused `receipts` message type
-2015-03-20
-  * Updated all scripts to use EDT instead of EST
-2015-01-09
-  * Changed the "alerts" script for the erroneous deadline notification of 2014w53
-  * Reverted the "notifications" script to the normal Monday deadline
-2015-01-05
-  * Changed the "notifications" script for the late release of 2014w52
-2015-01-03
-  * Changed the "alerts" script for the late release of 2014w52
-2014-12-30
-  * Changed the "alerts" script for the late release of 2014w51
-2014-11-??
-  * Original version
 """
 
 # standard library
@@ -62,6 +13,7 @@ import json
 import mysql.connector
 
 # first party
+from delphi.flu_contest.epicast.epicast_emails import EpicastEmails
 import delphi.operations.emailer as emailer
 import delphi.operations.secrets as secrets
 
@@ -173,7 +125,7 @@ def connect_to_database(connector_impl):
   return connector_impl.connect(user=u, password=p, database='epicast2')
 
 
-def main(args, connector_impl=mysql.connector):
+def main(args, connector_impl=mysql.connector, emailer_impl=emailer):
   """Generate and submit various emails to epicast participants."""
 
   #Verbosity-dependent print
@@ -197,12 +149,6 @@ def main(args, connector_impl=mysql.connector):
     email_type = 'notifications'
   users = get_users(cur, 'email_%s' % (email_type), '1') - get_users(cur, '_debug', '1')
 
-  # Slicing users into batches to send notification emails.
-  # Disabled 10 apr 2020; so long as load remains in the 200-300s this is not needed
-  # total_batches = 5
-  # current_batch = 4
-  # users = set(sorted(users)[current_batch::total_batches])
-
   log('%d users selected to receive email %s' % (len(users), args.type), True)
   if args.type == 'alerts':
     #users = users - get_users(cur, '_delphi', '0')
@@ -225,155 +171,32 @@ def main(args, connector_impl=mysql.connector):
 
   #Send the emails
   for u in users:
-    s = get_scores(cur, u)
-    score_text = ''
-    score_html = ''
-    if s[0] > 0:
-#       score_text = '''
-# Your forecast last week received a score of: %d (ranked #%d)
+    user_id, user_name, user_email = u
+    last_score, last_rank, total_score, total_rank = get_scores(cur, u)
 
-# Your overall score is: %d (ranked #%d)
+    if args.type == 'alerts':
+      subject, text, html = EpicastEmails.get_alert(user_id, user_name)
 
-# Note: To be listed on the leaderboards, simply enter your initials on the preferences page at http://epicast.org/preferences.php
+    elif args.type == 'notifications':
+      subject, text, html = EpicastEmails.get_notification(
+          user_id, user_name, last_score, last_rank, total_score, total_rank)
 
-# You can find the leaderboards at http://epicast.org/scores.php
-# ''' % (s[0], s[1], s[2], s[3])
-      score_text = '''
-Your overall score is: %d (ranked #%d)
+    elif args.type == 'reminders':
+      subject, text, html = EpicastEmails.get_reminder(user_id, user_name)
 
-Note: To be listed on the leaderboards, simply enter your initials on the preferences page at https://delphi.cmu.edu/crowdcast/preferences.php?user=%s
-
-You can find the leaderboards at https://delphi.cmu.edu/crowdcast/scores.php
-''' % (s[2], s[3], u[0])
-
-#       score_html = '''
-# <p>
-#   Your forecast last week received a score of: %d (<i>ranked #%d</i>)
-#   <br />
-#   Your overall score is: %d (<i>ranked #%d</i>)
-#   <br />
-#   Note: To be listed on the <a href="http://epicast.org/scores.php">leaderboards</a>, simply enter your initials on the preferences page <a href="http://epicast.org/preferences.php?user=%s">here</a>.
-# </p>
-#       ''' % (s[0], s[1], s[2], s[3], u[0])
-
-      score_html = '''
-<p>
-  Your overall score is: %d (<i>ranked #%d</i>)
-  <br />
-  Note: To be listed on the <a href="https://delphi.cmu.edu/crowdcast/scores.php">leaderboards</a>, simply enter your initials on the preferences page <a href="https://delphi.cmu.edu/crowdcast/preferences.php?user=%s">here</a>.
-</p>
-      ''' % (s[2], s[3], u[0])
-
-    #Email contents
-    emails = {
-
-################################################################################
-# ALERTS                                                                       #
-################################################################################
-      'alerts': {
-        'subject': 'Crowdcast Needs Your Help',
-        'text': '''Dear %s...''' % (u[1]),
-        'html': '''Dear %s...''' % (u[1]),
-      },
-
-################################################################################
-# NOTIFICATIONS                                                                #
-################################################################################
-      'notifications': {
-        'subject': 'New Data Available (Deadline: Monday 10 AM)',
-        'text': '''
-
-Dear %s,
-
-The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
-Thank you so much for your support and cooperation!
-
-To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
-%s
-Thank you again for your participation, and good luck on your forecasts!
-Happy Forecasting!
--The DELPHI Team
-        ''' % (u[1], u[0], score_text),
-        'html': '''
-
-<p>
-  Dear %s,
-</p><p>
-  The CDC has released another week of influenza-like-illness (ILI) surveillance data. A new round of covid19-related forecasting is now underway, and we need your forecasts! We are asking you to please submit your forecasts by <b>10:00 AM (ET)</b> this coming Monday.
-  Thank you so much for your support and cooperation!
-</p><p>
-  To login and submit your forecasts, click <a href="https://delphi.cmu.edu/crowdcast/launch.php?user=%s">here</a> or visit https://delphi.cmu.edu/crowdcast/ and enter your User ID: %s
-</p>%s<p>
-  Thank you again for your participation, and good luck on your forecasts!
-</p><p>
-  Happy Forecasting!
-<br />
-  -The DELPHI Team
-</p>
-        ''' % (u[1], u[0], u[0], score_html),
-      },
-
-################################################################################
-# REMINDERS                                                                    #
-################################################################################
-      'reminders': {
-        'subject': 'Forecasts Needed (Deadline: Monday 10AM)',
-        'text': '''
-Dear %s,
-
-
-This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by <b> 10:00AM (ET) on Monday</b>. Thank you so much for your support and cooperation!
-
-
-To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast and enter your User ID: %s.
-
-
-Happy Forecasting!
-
--The DELPHI Team
-        ''' % (u[1], u[0]),
-        'html': '''
-<p>
-  Dear %s,
-</p><p>
-  This is just a friendly reminder that your influenza-like-illness (ILI) forecasts are due by <b> 10:00AM (ET) on Monday</b>. Thank you so much for your support and cooperation!
-</p><p>
-  To login and submit your forecasts, visit https://delphi.cmu.edu/crowdcast and enter your User ID: %s.
-</p><p>
-  Happy Forecasting!
-  <br />
-  -The DELPHI Team
-</p>
-        ''' % (u[1], u[0]),
-      },
-################################################################################
-    }
-    emails[args.type]['text'] += '''
-
-[This is an automated message. To edit your email preferences or to stop receiving these emails, follow the unsubscribe link below.]
-
-Unsubscribe: https://delphi.cmu.edu/crowdcast/preferences.php?user=%s
-    ''' % (u[0])
-    emails[args.type]['html'] = '<html><body>' + emails[args.type]['html'] + '''
-<hr />
-<p style="color: #666; font-size: 0.8em;">
-  [This is an automated message. To edit your email preferences or to stop receiving these emails, click the unsubscribe link below.]
-  <br />
-  <a href="https://delphi.cmu.edu/crowdcast/preferences.php?user=%s">Unsubscribe</a>
-</p>
-    ''' % (u[0]) + '</body></html>'
-    to, subject, body = u[2], emails[args.type]['subject'], emailer.encode(emails[args.type])
-    if args.print:
-      log('%s -> %s\n%s' % (subject, to, emails[args.type]['text']), True)
     else:
-      sql = "INSERT INTO automation.email_queue (`from`, `to`, `subject`, `body`) VALUES ('%s', '%s', '[Crowdcast] %s', '%s')" % (secrets.flucontest.email_epicast, to, subject, body)
-      execute_sql(cur, sql)
+      raise Exception('not implemented')
+
+    if args.print:
+      log('%s -> %s\n%s' % (subject, user_email, text), True)
+    else:
+      emailer_impl.queue_email(
+          to=user_email, subject=subject, text=text, html=html)
+
   if not args.print:
-    sql = "CALL automation.RunStep(2)"
-    execute_sql(cur, sql)
+    emailer_impl.call_emailer()
 
   #Cleanup
-  cnx.commit()
   cur.close()
   cnx.close()
   log('Done!', True)
