@@ -16,8 +16,8 @@ class Tests(unittest.TestCase):
   """Basic unit tests."""
 
   def test_get_argument_parser(self):
-      """An ArgumentParser should be returned."""
-      self.assertIsInstance(get_argument_parser(), argparse.ArgumentParser)
+    """An ArgumentParser should be returned."""
+    self.assertIsInstance(get_argument_parser(), argparse.ArgumentParser)
 
   def test_connect_to_database(self):
     """Connect to the database with expected credentials."""
@@ -49,7 +49,7 @@ class Tests(unittest.TestCase):
     mock_connector = MagicMock()
     cnx = connect_to_database(mock_connector)
     cur = cnx.cursor()
-    cur.inserted = False
+    mock_emailer = MagicMock()
 
     # this is not elegant, but it's a quick way to simulate each query
     def handle_query(sql):
@@ -66,19 +66,16 @@ class Tests(unittest.TestCase):
       if sql.startswith('SELECT dayname'):
         cur.__iter__.return_value = [('Someday',)]
 
-      # take note of insert
-      if sql.startswith('INSERT INTO '):
-        cur.inserted = True
-
     cur.execute = handle_query
 
-    main(args, connector_impl=mock_connector)
+    main(args, connector_impl=mock_connector, emailer_impl=mock_emailer)
 
     # check for at least one sent email ("force" flag guarantees this)
-    self.assertTrue(cur.inserted)
+    self.assertTrue(mock_emailer.queue_email.called)
+    self.assertTrue(mock_emailer.call_emailer.called)
 
-    # check for final database commit as proxy for successful run
-    self.assertTrue(cnx.commit.called)
+    # check for final database close as proxy for successful run
+    self.assertTrue(cnx.close.called)
 
   def test_main_reminders(self):
     """Send the reminder email."""
@@ -92,7 +89,7 @@ class Tests(unittest.TestCase):
     mock_connector = MagicMock()
     cnx = connect_to_database(mock_connector)
     cur = cnx.cursor()
-    cur.inserted = False
+    mock_emailer = MagicMock()
 
     # this is not elegant, but it's a quick way to simulate each query
     def handle_query(sql):
@@ -109,16 +106,13 @@ class Tests(unittest.TestCase):
       if sql.startswith('SELECT dayname'):
         cur.__iter__.return_value = [('Someday',)]
 
-      # take note of insert
-      if sql.startswith('INSERT INTO '):
-        cur.inserted = True
-
     cur.execute = handle_query
 
-    main(args, connector_impl=mock_connector)
+    main(args, connector_impl=mock_connector, emailer_impl=mock_emailer)
 
     # check for at least one sent email ("force" flag guarantees this)
-    self.assertTrue(cur.inserted)
+    self.assertTrue(mock_emailer.queue_email.called)
+    self.assertTrue(mock_emailer.call_emailer.called)
 
-    # check for final database commit as proxy for successful run
-    self.assertTrue(cnx.commit.called)
+    # check for final database close as proxy for successful run
+    self.assertTrue(cnx.close.called)
