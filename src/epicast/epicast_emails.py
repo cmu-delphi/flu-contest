@@ -196,7 +196,8 @@ class EpicastEmails:
 
     html_template += EpicastEmails.Template.UNSUBSCRIBE['html']
     html_values += (user_id,)
-    final_html = EpicastEmails.prepare(html_template) % html_values
+    temp_html = EpicastEmails.prepare(html_template) % html_values
+    final_html = '<html><body>' + temp_html + '</body></html>'
 
     return final_subject, final_text, final_html
 

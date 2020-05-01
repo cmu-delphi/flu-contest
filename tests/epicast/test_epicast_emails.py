@@ -18,6 +18,16 @@ UNSUBSCRIBE_SNIPPETS = [
 class Tests(unittest.TestCase):
   """Basic unit tests."""
 
+  def make_common_assertions(self, subject, text, html):
+    """Assert truths common to all email types."""
+
+    self.assertIsNotNone(re.match(SUBJECT_PATTERN, subject))
+    for snippet in UNSUBSCRIBE_SNIPPETS:
+      self.assertIn(snippet, text.lower())
+      self.assertIn(snippet, html.lower())
+    self.assertTrue(html.startswith('<html><body>'))
+    self.assertTrue(html.endswith('</body></html>'))
+
   def test_get_alert(self):
     """Get an alert email."""
 
@@ -30,11 +40,7 @@ class Tests(unittest.TestCase):
     self.assertIn('delphi', text.lower())
     self.assertIn('delphi', html.lower())
 
-    # common to all emails
-    self.assertIsNotNone(re.match(SUBJECT_PATTERN, subject))
-    for snippet in UNSUBSCRIBE_SNIPPETS:
-      self.assertIn(snippet, text.lower())
-      self.assertIn(snippet, html.lower())
+    self.make_common_assertions(subject, text, html)
 
   def test_get_notification_with_score(self):
     """Get a notification email with a score."""
@@ -56,11 +62,7 @@ class Tests(unittest.TestCase):
     self.assertIn('overall score is: 7', html.lower())
     self.assertIn('ranked #8', html.lower())
 
-    # common to all emails
-    self.assertIsNotNone(re.match(SUBJECT_PATTERN, subject))
-    for snippet in UNSUBSCRIBE_SNIPPETS:
-      self.assertIn(snippet, text.lower())
-      self.assertIn(snippet, html.lower())
+    self.make_common_assertions(subject, text, html)
 
   def test_get_notification_without_score(self):
     """Get a notification email without a score."""
@@ -82,11 +84,7 @@ class Tests(unittest.TestCase):
     self.assertNotIn('score', html.lower())
     self.assertNotIn('ranked', html.lower())
 
-    # common to all emails
-    self.assertIsNotNone(re.match(SUBJECT_PATTERN, subject))
-    for snippet in UNSUBSCRIBE_SNIPPETS:
-      self.assertIn(snippet, text.lower())
-      self.assertIn(snippet, html.lower())
+    self.make_common_assertions(subject, text, html)
 
   def test_get_reminder(self):
     """Get a reminder email."""
@@ -99,8 +97,4 @@ class Tests(unittest.TestCase):
     self.assertIn('a friendly reminder', text.lower())
     self.assertIn('a friendly reminder', html.lower())
 
-    # common to all emails
-    self.assertIsNotNone(re.match(SUBJECT_PATTERN, subject))
-    for snippet in UNSUBSCRIBE_SNIPPETS:
-      self.assertIn(snippet, text.lower())
-      self.assertIn(snippet, html.lower())
+    self.make_common_assertions(subject, text, html)
