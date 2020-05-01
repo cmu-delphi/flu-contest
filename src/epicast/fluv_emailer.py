@@ -1,56 +1,14 @@
-"""
-===============
-=== Purpose ===
-===============
+"""Sends emails to Epicast-FLUV users.
 
-Sends emails to Epicast-FLUV users:
-  `alerts`: custom, one-time `notifications`-type email for a manual user group
-  `notifications`: for all users, says that the CDC published new data
-  `reminders`: for users with missing forecasts, a reminder that the deadline
-    is soon
+Email categories include:
+
+- `alerts`: custom, one-time `notifications`-type email for a manual user group
+- `notifications`: for all users, says that the CDC published new data
+- `reminders`: for users with missing forecasts, a reminder that the deadline
+is soon
 
 Individual user preferences are respected; it won't email people who don't want
 to be emailed.
-
-
-=================
-=== Changelog ===
-=================
-
-2016-12-14
-  + use secrets
-2016-01-08
-  * Further reverted "notifications" for normal schedule
-2016-01-07
-  * Reverted "notifications" for normal schedule
-2015-12-21
-  + Use database to get name of day of upcoming deadline
-  * Changed "notifications" for the late release of 2015w50/51
-2015-11-30
-  * Changed and reverted "notifications" for the late release of 2015w46
-2015-11-13
-  * Only include score info in "notifications" if score is positive
-2015-11-06
-  * Updated "alerts" to ask last year's users to join again this year
-2015-10-30
-  * Updated documentation
-  * Use database `epicast2`
-  * Updated all scripts to use ET instead of EDT
-  * Changed the "alerts" script to be a delphi-only notification for 2015w42
-  - Unused `receipts` message type
-2015-03-20
-  * Updated all scripts to use EDT instead of EST
-2015-01-09
-  * Changed the "alerts" script for the erroneous deadline notification of 2014w53
-  * Reverted the "notifications" script to the normal Monday deadline
-2015-01-05
-  * Changed the "notifications" script for the late release of 2014w52
-2015-01-03
-  * Changed the "alerts" script for the late release of 2014w52
-2014-12-30
-  * Changed the "alerts" script for the late release of 2014w51
-2014-11-??
-  * Original version
 """
 
 # standard library
@@ -196,12 +154,6 @@ def main(args, connector_impl=mysql.connector):
   if email_type == 'alerts':
     email_type = 'notifications'
   users = get_users(cur, 'email_%s' % (email_type), '1') - get_users(cur, '_debug', '1')
-
-  # Slicing users into batches to send notification emails.
-  # Disabled 10 apr 2020; so long as load remains in the 200-300s this is not needed
-  # total_batches = 5
-  # current_batch = 4
-  # users = set(sorted(users)[current_batch::total_batches])
 
   log('%d users selected to receive email %s' % (len(users), args.type), True)
   if args.type == 'alerts':
