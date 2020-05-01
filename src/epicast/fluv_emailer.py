@@ -8,6 +8,7 @@ to be emailed.
 import argparse
 import base64
 import json
+import random
 
 # third party
 import mysql.connector
@@ -190,8 +191,15 @@ def main(args, connector_impl=mysql.connector, emailer_impl=emailer):
     if args.print:
       log('%s -> %s\n%s' % (subject, user_email, text), True)
     else:
+      # smear emails over time by setting a random priority which the emailer
+      # will use to determine email batches
+      priority = random.random()
       emailer_impl.queue_email(
-          to=user_email, subject=subject, text=text, html=html)
+          to=user_email,
+          subject=subject,
+          text=text,
+          html=html,
+          priority=priority)
 
   if not args.print:
     emailer_impl.call_emailer()
