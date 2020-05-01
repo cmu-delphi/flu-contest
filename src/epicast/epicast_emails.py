@@ -217,12 +217,7 @@ class EpicastEmails:
 
   @staticmethod
   def get_notification(
-      user_id,
-      user_name,
-      last_score,
-      last_rank,
-      total_score,
-      total_rank):
+      user_id, user_name, last_score, last_rank, total_score, total_rank):
     """Fill out and return the notification email."""
 
     template = EpicastEmails.Template.NOTIFICATION
