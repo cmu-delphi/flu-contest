@@ -90,18 +90,18 @@ class EpicastEmails:
         This past week was the last week of CDC’s initiative to forecast Influenza
         Like Illness (ILI) this year.  Our Crowdcasting activity is therefore halting
         for now.  Accordingly, you will not receive any more weekly reminders.
-        
+        </p><p>
         The exact extent of ILI activity this year will not become fully known for a
         few more months, once all reporting has stabilized.  We plan to analyze
         Crowdcast’s accuracy and publish the results thereafter.
-        
+        </p><p>
         In the coming Fall, our plan (as well as CDC’s) is to focus on tracking and
         forecasting COVID-19 activity.  Although one can never be sure how the coming
         flu season will unfold, we suspect (and hope) that flu activity will be
         considerably diminished in the coming Fall and Winter, due both to heightened
         flu vaccination and diminished spread as a spillover benefit from COVID-19
         mitigation efforts.
-        
+        </p><p>
         Our strategy for forecasting COVID-19 is still evolving.  If we decide to apply
         the Crowdcasting method to COVID-19 forecasting, we will certainly invite you 
         to participate again. In the meantime, we invite you to check out what we have
@@ -110,12 +110,12 @@ class EpicastEmails:
         href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast
         API</a>, which makes a variety of traditional and alternative indicators of
         disease activity conveniently available through Python and R packages.
-
+        </p><p>
         We are very grateful for your participation in our Crowdcast project.
         Thank you for your contributions.
         </p><p>
         -<a href="https://delphi.cmu.edu/">The DELPHI Team</a>
-        
+        <br>
         Carnegie Mellon University
         </p>
       ''',
