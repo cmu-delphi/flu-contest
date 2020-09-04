@@ -75,9 +75,9 @@ class EpicastEmails:
         We are very grateful for your participation in our Crowdcast project.
         Thank you for your contributions.
         
-        -The DELPHI Team
+        -The DELPHI group
         
-        Delphi homepage: https://delphi.cmu.edu/
+        DELPHI homepage: https://delphi.cmu.edu/
         Interactive COVID-19 map: https://covidcast.cmu.edu/
         COVIDcast API: https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html
         
@@ -114,7 +114,7 @@ class EpicastEmails:
         We are very grateful for your participation in our Crowdcast project.
         Thank you for your contributions.
         </p><p>
-        -<a href="https://delphi.cmu.edu/">The DELPHI Team</a>
+        -<a href="https://delphi.cmu.edu/">The DELPHI group</a>
         <br>
         Carnegie Mellon University
         </p>
