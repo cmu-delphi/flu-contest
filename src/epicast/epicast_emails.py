@@ -45,7 +45,7 @@ class EpicastEmails:
 
     # placeholder for one-off emails sent on special occasions
     ALERT = {
-      'subject': 'Thank You',
+      'subject': 'End of flu forecasting round',
       'text': '''
         Dear Crowdcast volunteer,
 
