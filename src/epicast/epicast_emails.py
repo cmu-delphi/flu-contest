@@ -67,7 +67,7 @@ class EpicastEmails:
         Our strategy for forecasting COVID-19 is still evolving.  If we decide to apply
         the Crowdcasting method to COVID-19 forecasting, we will certainly invite you 
         to participate again. In the meantime, we invite you to check out what we have
-        created so far, including our interactive map for tracking COVID-19 in the U.S.
+        created so far, including our interactive map for tracking COVID-19 in the U.S. 
         and our COVIDcast API, which makes a variety of traditional and alternative
         indicators of disease activity conveniently available through Python and R
         packages.
@@ -106,7 +106,7 @@ class EpicastEmails:
         the Crowdcasting method to COVID-19 forecasting, we will certainly invite you 
         to participate again. In the meantime, we invite you to check out what we have
         created so far, including our <a href="https://covidcast.cmu.edu/">interactive
-        map</a> for tracking COVID-19 in the U.S.and our <a 
+        map</a> for tracking COVID-19 in the U.S. and our <a 
         href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast
         API</a>, which makes a variety of traditional and alternative indicators of
         disease activity conveniently available through Python and R packages.
