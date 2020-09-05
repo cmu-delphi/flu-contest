@@ -47,7 +47,7 @@ class EpicastEmails:
     ALERT = {
       'subject': 'End of flu forecasting round',
       'text': '''
-        Dear Crowdcast volunteer,
+        Dear %s,
 
         This past week was the last week of CDC’s initiative to forecast Influenza
         Like Illness (ILI) this year.  Our Crowdcasting activity is therefore halting
@@ -85,7 +85,7 @@ class EpicastEmails:
       ''',
       'html': '''
         <p>
-          Dear Crowdcast volunteer,
+          Dear %s,
         </p><p>
         This past week was the last week of CDC’s initiative to forecast Influenza
         Like Illness (ILI) this year.  Our Crowdcasting activity is therefore halting
